@@ -1,0 +1,104 @@
+---
+title: |
+
+  ![](Rlogo.png){width=1in} 
+  
+  \
+
+  Curso introdutório de R
+author: 
+ - Thiago Mendes Rosa
+date: "`r format(Sys.Date(),'%d/%m/%Y')`"
+output:
+  pdf_document: default
+  word_document: default
+header-includes: 
+  - \renewcommand{\and}{\\}
+mainfont: Times New Roman
+fontsize: 12pt
+---
+
+
+**Instrutor**
+
+Thiago Mendes Rosa - DIRUR/COMEQ
+
+Telefone: 61 3342-2272
+
+E-mail: \url{thiago.rosa@ipea.gov.br}
+
+\bigskip
+
+**Data do curso**
+
+A definir
+
+Horário: 08:00 às 12:00
+
+Carga horária: 8 horas
+
+\bigskip
+
+**Público-alvo**
+
+- Pesquisadores do IPEA
+
+\bigskip
+
+**Requisitos básico:**
+
+- Ter login de acesso ao RStudio Server da COMEQ (solicitações para criação de usuário devem ser encaminhadas para DIRUR/COMEQ -- thiago.rosa@ipea.gov.br)
+
+**Requisitos desejáveis:**
+
+- Noções de lógica de programação
+- Noções básicas de estatística
+- Noções básicas de inglês (para facilitar pesquisas e entendimento das funções)
+
+\bigskip
+
+**Conteúdo de R:**
+
+O material completo do curso está disponível em:
+
+\url{https://thiagomendesrosa.github.io/curso_r_ipea/}.
+
+- Introdução:
+    - Por que usar o R e não outros softwares?
+    - RSutdio Server
+    - Banco de dados da COMEQ
+    - GitHub
+    - RMarkdown
+
+\bigskip    
+    
+    
+- Preliminares:
+    - Estrutura do RStudio Server;
+    - Pacotes;
+    - Operadores básicos;
+    - Utilizar chamada de funções;
+    - Criar uma função;
+    - Tipos de dados;
+    - Controles de fluxo;
+    - Operador Pipe;
+    - Onde encontrar ajuda;
+    
+\bigskip    
+    
+- Manipulação da PNADC Trimestral
+    - Carga da PNADC
+    - Consultas ao banco de dados da Comeq
+    - Introdução ao `tidyverse`
+    - Utilização do pacote `survey` para pesquisas amostrais
+    - Estimativa de totais e proporções populacionais
+    - Estimativas dos intervalos de confiança
+    - Aplicação do operador `pipe`
+    - Manipulação de textos com o pacote `stringr`
+    - Manipulação de datas com o pacote `lubridate`
+    - Criação de mapas
+    - Transformação de dados com `dplyr` e `tidyr`
+    - Visualização de dados com `ggplot2`
+    - Elaboração de relatórios com o `RMarkdown`
+    - Utilização do Github com o RStudio Server para controle e versionamento de projetos
+    
