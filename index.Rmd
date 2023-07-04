@@ -1913,8 +1913,7 @@ library(scales)
 # Construir o objeto com os valores
 salario2 <- vars_relatorio %>%
   # Filtrar somente para casos válidos
-  srvyr::filter(is.na(faixas_salario)==FALSE,
-                str_sub(UF,1,1)==4) %>% 
+  srvyr::filter(is.na(faixas_salario)==FALSE) %>% 
   # Agrupar por RA e faixas de salário
   srvyr::group_by(UF,faixas_salario) %>%
   # Calcular as proporções por faixa de salário
@@ -1929,7 +1928,7 @@ salario2 %>%
   # Construir o gráfico de barras
   geom_bar(stat = "identity") +
   # Construir o gráfico com os erros
-  geom_errorbar(aes(ymin=n_low,ymax=n_upp, group=RA),size=1,width=0, color="darkred")+
+  geom_errorbar(aes(ymin=n_low,ymax=n_upp, group=UF),linewidth=1,width=0, color="darkred")+
   # Inverter os eixos
   coord_flip()+
   # Suprimir o nome dos eixos
@@ -1946,7 +1945,7 @@ salario2 %>%
 Para o último gráfico, como estamos realizando uma estatística para o domicílio, precisamos filtrar para selecionarmos apenas a informação do chefe (cujo peso é utilizado para expandir os resultados domiciliares). Fazemos isso com auxílio da função `filter()`. Como maneira de facilitar a leitura dos dados, adicionamos os valores exatos de cada coluna com a função `geom_text()`.
 
 ```{r}
-# Construir o objeto com o esgotamento sanitário
+# Construir o objeto com o número de moradores
 nmor <- pnad_design %>%
   srvyr::filter(V2005==1) %>% 
   srvyr::mutate(# Criar variável para o número de pessoas no domicílio
@@ -1970,7 +1969,7 @@ nmor_grafico <- nmor %>%
   geom_errorbar(size=4, width=0,
                 color="black")+
   # Ajustar os nomes dos eixos
-  labs(x="",y="% Domicílios")+
+  labs(x="",y="%")+
   # Retirar o nome da legenda
   theme(legend.position="none")+
   # Ajustar a formatação dos rótulos
@@ -1981,7 +1980,7 @@ nmor_grafico <- nmor %>%
                 vjust = -0.25,hjust=1.25)
 
 # Plotar grafico
-esgotamento_grafico
+nmor_grafico
 ``` 
 
 Vamos ver como fazer um gráfico de setores, com as mesmas informações anteriores. Note que, para fazer esse tipo de gráfico, perderemos as informações dos intervalos de confiança. Para que o gráfico fique mais elegante, criamos um tema retirando todos os elementos básicos, atribuindo-o a um objeto chamado `tema_branco`. Para esse tipo de gráfico, precisamos da função `coord_polar()`, para colocar o gráfico em coordenada polar. Com isso, o posicionamento dos rótulos ficam um pouco mais complexos, sendo necessário criar uma variável com a posição do *label*.
@@ -1994,7 +1993,7 @@ library(ggrepel)
 nmor2 <- pnad_design %>%
   srvyr::filter(V2005==1) %>% 
   srvyr::mutate(# Criar variável para o número de pessoas no domicílio
-                nmor=factor(case_when(V2001==1~"Unipessoal",
+                nmor=factor(case_when(V2001==1~"1 Unipessoal",
                                       V2001==2~"2 pessoas",
                                       V2001==3~"3 pessoas",
                                       V2001==4~"4 pessoas",
@@ -2006,7 +2005,7 @@ nmor2 <- pnad_design %>%
   # Deixar as informações em ordem decrescente
   dplyr::arrange(-n) %>%
   # Construir uma variável auxiliar, com a posição do label
-  dplyr::mutate(pos=cumsum(n)-n/8)
+  dplyr::mutate(pos=cumsum(n)-n/10)
 
 # Criar o tema branco, eliminando todos os elementos gráficos padrões
 tema_branco <- theme_minimal()+
@@ -2030,7 +2029,7 @@ tema_branco <- theme_minimal()+
 nmor2 %>%
   # Plotar o gráfico, com as quantidades no eixo y, o preenchimento com as categorias,
   # reordenando as quantudades, e o valor 1 para travar o eixo x
-  ggplot(aes(x=1,y=n,fill=fct_reorder(nmor2,n)))+
+  ggplot(aes(x=1,y=n,fill=fct_reorder(nmor,n)))+
   # Construir as "barras"
   geom_bar(stat="identity")+
   # Transformar em coordenada polar o eixo y, com início em 0
@@ -2043,7 +2042,7 @@ nmor2 %>%
   scale_fill_discrete(name="")+
   # Adicionar o label com os valores, usando a função repel para evitar
   # sobreposições
-  geom_text_repel(aes(label = percent(n), y=pos), size=5, color="white",
+  geom_text_repel(aes(label = scales::percent(n), y=pos), size=5, color="white",
                   fontface="bold")
 ```
 
@@ -2053,7 +2052,7 @@ Alternativamente ao gráfico de setores, podemos fazer um gráfico de coluna agr
 pnad_design %>%
   srvyr::filter(V2005==1) %>% 
   srvyr::mutate(# Criar variável para o número de pessoas no domicílio
-                nmor=factor(case_when(V2001==1~"Unipessoal",
+                nmor=factor(case_when(V2001==1~"1 Unipessoal",
                                       V2001==2~"2 pessoas",
                                       V2001==3~"3 pessoas",
                                       V2001==4~"4 pessoas",
@@ -2065,20 +2064,20 @@ pnad_design %>%
   # Gerar uma área de plotage,
   ggplot()+
   # Gerar a geometria da barra
-  geom_bar(aes(x=1,y=n,fill=esgotamento_caesb),stat = "identity",alpha=0.5) +
+  geom_bar(aes(x=1,y=n,fill=nmor),stat = "identity",alpha=0.5) +
   # Adicionar os percentuais ao gráfico, na forma de texto
   geom_text(aes(x=1, label = paste0(format(abs(round(n*100)), 
                                                  big.mark = ".",
                                                  scientific = FALSE,
                                                  decimal.mark=","),"%"),
                     y= n,
-                group = esgotamento_caesb),
+                group = nmor),
             size=4, 
             fontface = "bold",
             color = "black",
             position = position_stack(vjust = .5)) +
   # Retirar o nome da legenda
-  scale_fill_discrete(name="")+
+  scale_fill_manual(name="",values=RColorBrewer::brewer.pal(5, "Dark2"))+
   # Ajustar o label da escala y
   scale_y_continuous(labels = scales::percent)+
   # Retirar o rótulo dos eixos
@@ -2101,7 +2100,7 @@ save.image("dados/objetos.rda", compress = T)
 # Carregar os objetos salvos
 load("dados/objetos.rda")
 # Salvar somente objetos de interesse
-# save(list=c("piramide","esgotamento","salario"),
+# save(list=c("piramide","nmor","salario"),
 #      file="dados/objetos.rda")
 ```
 
