@@ -772,7 +772,7 @@ Repare que existem várias maneiras de definir o diretório padrão. Caso ele se
 
 Agora vamos carregar novamente a base do Tesouro Direto, desta vez apenas utilizando a linha de comando. 
 
-```{r, eval=FALSE}
+```{r}
 # Carregar o pacote
 library(data.table)
 
@@ -781,9 +781,14 @@ EstoqueTesouroDireto <- data.table::fread("https://www.tesourotransparente.gov.b
                                          data.table = FALSE,
                                          integer64 = "character")
 
+# Baixar arquivo
+# download.file("https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv",
+#               destfile = "dados/EstoqueTesouroDireto.csv",
+#               mode = "wb")
+
 # Carregar a base de um arquivo local
 EstoqueTesouroDireto <- data.table::fread("dados/EstoqueTesouroDireto.csv",
-                                    dec = ",",encoding = "Latin-1",
+                                    dec = ".",encoding = "Latin-1",
                                           data.table = FALSE,
                                          integer64 = "character")
 ```
@@ -924,6 +929,12 @@ pnadc %>%
   dplyr::rename(Area=V1022,
                 V1028=Peso) %>% 
   head()
+
+pnadc <- pnadc %>%
+  # Alterar os nomes das colunas
+  dplyr::rename(Area=V1022,
+                V1028=Peso) 
+
 ```
 
 
@@ -944,10 +955,10 @@ Para termos o dicionário de dados da base de moradores prontamente acessível d
 # Definir url
 url <- "https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
 
-# Baixar arquivo
-download.file(url,
-              destfile = "./dados/dic.zip",
-              mode = "wb")
+# # Baixar arquivo
+# download.file(url,
+#               destfile = "./dados/dic.zip",
+#               mode = "wb")
 
 # Extrair informações
 unzip("./dados/dic.zip",
@@ -1116,7 +1127,7 @@ Veja como funcionam os testes lógicos.
 list(strings = s, expressoes = expressoes) %>%
   purrr::cross_df() %>%
   dplyr::distinct() %>%
-  dplyr::mutate(detect = str_detect(s, expressoes)) %>%
+  dplyr::mutate(detect = str_detect(strings, expressoes)) %>%
   tidyr::spread(expressoes, detect) %>%
   knitr::kable(caption = "Teste lógicos de strings") %>% 
   kableExtra::kable_styling(full_width=T) 
@@ -1266,7 +1277,7 @@ Assim, percebemos que, até 2013, houve aumento constante do valor do estoque, a
 
 Com o R, é possível fazermos mapas com relativa facilidade. Para tanto, precisaremos de informações geográficas dos mapas que queremos desenhar. Vamos fazer conexão com o banco de dados a e pegar as informações necessárias.
 
-```{r, eval=FALSE}
+```{r}
 library(ggrepel)
 library(sf)
 
@@ -1323,7 +1334,7 @@ Vamos, agora, finalizar a construção do nosso mapa.
 map <- mapa %>%  
     # Calcular o centro das coordenadas (para o label)
   dplyr::mutate(lat=sf::st_coordinates(sf::st_centroid(geometry))[,2],
-                long=sf::st_coordinates(sf::st_centroid(geometry))[,1]) 
+                long=sf::st_coordinates(sf::st_centroid(geometry))[,1]) %>% 
   # Plotar o mapa
   ggplot()+
   # Fazer um mapa coroplético com a população
@@ -1375,7 +1386,7 @@ tf <- "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/
 td <- "dados/ufs.zip"
 
 # Fazer o download do arquivo
-download.file(tf, td, mode="wb")
+#download.file(tf, td, mode="wb")
 
 # Descompactar o arquivo
 unzip(td,exdir="dados/ufs")
@@ -1571,6 +1582,8 @@ Com essas informações, precisamos de apenas um passo para declarar o plano amo
 
 ```{r}
 
+library(srvyr)
+
 vars <- c("UF","V1028","V1022","VD4020","V2009","V2005",
           paste0("V",1028001:1028200))
 
@@ -1700,7 +1713,7 @@ Caso o desejo fosse estimar esse mesmo total por UF, isso poderia ser feito com 
 
 ```{r}
 
-x <- pnad_design %>%
+pnad_design %>%
   # Filtrar somente a população com 18 anos ou mais de idade, retirando os códigos de não informação
   srvyr::filter(V2009>=18) %>%
   # Informar o grupo que queremos a informação
@@ -1730,7 +1743,7 @@ mean(pnadc$VD4020,na.rm=T)
 rnd<-pnad_design %>%
   # Calcular a renda domiciliar real média do DF
   srvyr::summarise(renda_real=survey_mean(VD4020*inflacao_br,na.rm=T,vartype="ci"),
-                   renda=survey_mean(VD4020,na.rm=T,vartype="ci"))
+                   renda=survey_mean(VD4020,na.rm=T,vartype="ci")) %>% 
   round()
 ```
 
@@ -2109,7 +2122,7 @@ Muitas vezes não precisamos salvar todo o nosso diretório e queremos apenas sa
 ```{r}
 # Salvar os objetos no formato RDS
 saveRDS(piramide,"dados/piramide.rds")
-saveRDS(mor,"dados/nmor.rds")
+saveRDS(nmor,"dados/nmor.rds")
 saveRDS(salario,"dados/salario.rds")
 ```
 
