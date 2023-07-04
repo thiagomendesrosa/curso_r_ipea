@@ -1559,81 +1559,152 @@ Sendo assim, as estimativas fornecidas pela pesquisa estão sujeitas a um erro a
 
 Neste curso iremos aprender a declarar o plano amostral da PNADC no R, utilizando o pacote `survey`. Vamos utilizar também o pacote `srvyr`, que roda o pacote `survey` sob a lógica do pacote `dplyr`, para calcular as estimativas.
 
-## Declarar o plano amostral da PNAC
+## Declarar o plano amostral da PNADC
 
 
 Vamos agora declarar o plano amostral da PNADC trimestral. Para isso, vamos precisar de algumas informações básicas: 
 
-+ O inverso da fração amostral, conforme o sorteio em um determinado estrato: `PESO_PRE`;
-+ O estrato utilizado para pós-estratificação: `POS_ESTRATO`;
-+ A população total de cada pós-estrato: `POP_AJUSTADA_PROJ`;
-+ O código único de identificação da unidade de amostragem: `A01nficha`.
++ O Peso trimestral com correção de não entrevista com calibração pela projeção de população: `V1028`;
++ O Peso replicado do domicílio e das pessoas: `V1028001` a `V1028200`
 
-A PDAD 2021 foi pós-estratificada de modo a refletir os totais populacionais projetados para os recortes territoriais considerados na pesquisa, por sexo e faixas etárias (quinquenais até 74 anos e 75 ou mais).
-
-O primeiro passo é criarmos o desenho inicial da pesquisa.
+Com essas informações, precisamos de apenas um passo para declarar o plano amostral da PNADC
 
 ```{r}
-# Carregar os pacotes necessários
-library(survey)
-library(srvyr)
 
-# Declarar o desenho incial
-sample.pdad <- 
-  survey::svydesign(id = ~A01nficha, # Identificador único da unidade amostrada
-                    strata = ~A01setor, # Identificação do estrato
-                    weights = ~PESO_PRE, # Inverso da fração amostral
-                    nest=TRUE, # Parâmetro de tratamento para os IDs dos estratos
-                    data=pdad # Declarar a base a ser utilizada
-                    )
+vars <- c("UF","V1028","V1022","VD4020","V2009","V2005",
+          paste0("V",1028001:1028200))
 
-# Criar um objeto para pós estrato
-post.pop <- pdad %>%
-  dplyr::group_by(POS_ESTRATO) %>% # Agrupar por pós-estrato
-  dplyr::summarise(Freq=max(POP_AJUSTADA_PROJ)) # Capturar o total da população
+pnadc <- DBI::dbGetQuery(db,paste0('select ',
+                                   paste0('"',vars,'"',collapse = ","), 
+                                   'from pnadc.pnadt202301'))
 
-# Declarar o objeto de pós-estrato
-# Estamos dizendo nesse passo qual é a população alvo para cada
-# pós-estrato considerado
-sample.pdad <- survey::postStratify(sample.pdad,~POS_ESTRATO,post.pop)
+pnad_design <- survey::svrepdesign(data=pnadc, 
+                                   weight=~V1028, 
+                                   type="bootstrap", 
+                                   repweights="V1028[0-9]+", 
+                                   mse=TRUE, 
+                                   replicates=length(sprintf("V1028%03d",
+                                                             seq(1:200))), 
+                                   df=length(sprintf("V1028%03d", 
+                                                     seq(1:200))))
 
-# Criar objeto para calcular os erros por bootstrap (Rao and Wu’s(n − 1) bootstrap)
-# J. N. K. Rao and C. F. J. Wu - Journal of the American Statistical Association
-# Vol. 83, No. 401 (Mar., 1988), pp. 231-241
-amostra <- survey::as.svrepdesign(sample.pdad, type = "subbootstrap")
-
-# Ajustar para tratamento de estratos com apenas uma UPA (adjust=centered)
-options(survey.lonely.psu = "adjust")
-
-# Ajustar objeto de amostra, para uso com o pacote srvyr (como tibble)
-amostra <- srvyr::as_survey(amostra)
+pnad_design <- as_survey(pnad_design)
 ```
 
-Pronto! Já temos o objeto com as informações da PDAD que iremos trabalhar no restante desta oficina. Vamos testar estimando o total de pessoas com 18 anos ou mais de idade no Distrito Federal. O nosso objeto base agora será o `amostra`, com o qual utilizaremos o pacote `srvyr`. Com a parâmetro `vartype='ci'`, obtemos as estimativas dos intervalos de confiança. 
+
+Pronto! Com o objeto `pnad_design` podemos fazer estimativas para a população, partindo dos dados amostrais. Vamos testar estimando o total da população brasileira. O nosso objeto base agora será o `pnad_design`, com o qual utilizaremos o pacote `srvyr`. Com a parâmetro `vartype='ci'`, obtemos as estimativas dos intervalos de confiança. 
 
 ```{r}
 # População DF com mais de 18 anos
-pop18 <- 
-amostra %>%
+pop18 <- pnad_design %>%
   # Filtrar somente a população com 18 anos ou mais de idade
-  srvyr::filter(idade>=18) %>%
+  srvyr::filter(V2009>=18) %>%
   # Criar uma variável auxiliar para contagem
   srvyr::mutate(count=1) %>%
   # Calcular o total da população, com seu intervalo de confiança
   srvyr::summarise(n=survey_total(count, vartype = "ci"))
 ```
 
-Verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no DF em 2018, sendo o valor pontual de `r pop18[1,1]` pessoas. Caso o desejo fosse estimar esse mesmo total por sexo, isso poderia ser feito com a função `group_by()`. Vamos aproveitar e calcular o percentual de cada grupo no total.
+Verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas. 
+
+Repare que, para calcular essas estimativas, foi necessário pegar do banco 201 variáveis de peso, o que significa um alto custo computacional de partida. Existe uma outra maneira de obter essas estimativas, com os mesmos valores pontuais, mas com variâncias ligeiramente diferentes. Para isso, necessitaremos das seguintes variáveis:
+
++ O código da UPA (Unidade Primária de Amostragem): `UPA`;
++ O ID do domicílio, composto pela junção da UPA, do número de seleção do domicílio e do painel de seleção: `UPA`,`V1008` e `V1014`;
++ O estrato do desenho amostral: `Estrato`;
++ O peso trimestral com correção de não entrevista SEM calibração pela projeção de população: `V1027`;
++ Os domínios de projeção geográficos: `posest`;
++ A projeção da população por níveis geográficos: `V1029`;
++ Os domínios de projeção por sexo e idade: `posest_sxi`;
++ A projeção da população por sexo e idade: `V1033`.
+
+Com essas informações iremos informar ao pacote `survey` o desenho inicial da pesquisa e a pos-estratificação, que seria as projeções populacionais para os domínios definidos.
 
 ```{r}
-amostra %>%
+
+vars <- c("UF","V1028","V1022","VD4020","V2009","V2005","V2007","V2001",
+          "UPA","V1008","V1014","Estrato","V1027","posest",
+          "V1029","posest_sxi","V1033")
+
+pnadc <- DBI::dbGetQuery(db,paste0('select ',
+                                   paste0('"',vars,'"',collapse = ","), 
+                                   'from pnadc.pnadt202301'))
+
+# Ajustar tipo das variáveis
+pnadc <- pnadc %>%                          
+  dplyr::mutate(ID_DOMICILIO=paste0(UPA,V1008,V1014)) %>% 
+  dplyr::mutate_at(vars(UPA,Estrato,posest,posest_sxi),
+                   list(~as.character(.)))
+
+desenho_inicial <- survey::svydesign(ids=~UPA+ID_DOMICILIO,
+                                     strata=~Estrato,
+                                     data=pnadc,
+                                     weights=~V1027,
+                                     nest=TRUE)
+
+# Totais populacionais por pós-estratos geográficos
+popc.types <- pnadc %>%
+  dplyr::group_by(posest) %>%
+  dplyr::summarise(Freq=first(V1029)) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(posest)
+ 
+# Totais populacionais por pós-estratos de sexo e idade
+popi.types <- pnadc %>%
+  dplyr::group_by(posest_sxi) %>%
+  dplyr::summarise(Freq=first(V1033)) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(posest_sxi)
+ 
+# # Informações populacionais
+pop.rake.calib <- c(sum(popc.types$Freq),
+                    popc.types$Freq[-1],
+                    popi.types$Freq[-1])
+
+# Declarar o plano amostral
+pnad_design <- survey::calibrate(design=desenho_inicial,
+                                 formula=~posest+posest_sxi,
+                                 pop=pop.rake.calib,
+                                 calfun="raking",
+                                 aggregate.stage=2,
+                                 bounds=c(0.2,5),
+                                 multicore=TRUE)
+
+# Ajustar para tratamento de estratos com apenas uma UPA (adjust=centered)
+options(survey.lonely.psu = "adjust")
+
+# Ajustar objeto de amostra, para uso com o pacote srvyr (como tibble)
+pnad_design <- as_survey(pnad_design)
+
+```
+
+Vamos rodar novamente nossas estimativas para a população brasileira com 18 anos ou mais.
+
+```{r}
+# População DF com mais de 18 anos
+pop18 <- pnad_design %>%
+  # Filtrar somente a população com 18 anos ou mais de idade
+  srvyr::filter(V2009>=18) %>%
+  # Criar uma variável auxiliar para contagem
+  srvyr::mutate(count=1) %>%
+  # Calcular o total da população, com seu intervalo de confiança
+  srvyr::summarise(n=survey_total(count, vartype = "ci"))
+```
+
+Agora, verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas, exatamente o mesmo calculado anteriomente.
+
+Assim, caso existam limitações computacionais, esse metodo pode ser utilizado, ressalvando-se as diferenças existentes nas estimativas das variâncias.
+
+Caso o desejo fosse estimar esse mesmo total por UF, isso poderia ser feito com a função `group_by()`. Vamos aproveitar e calcular o percentual de cada grupo no total.
+
+
+```{r}
+
+x <- pnad_design %>%
   # Filtrar somente a população com 18 anos ou mais de idade, retirando os códigos de não informação
-  srvyr::filter(idade>=18) %>%
-  # Ajustar a variável de sexo
-  srvyr::mutate(E04=factor(case_when(E04==1~"Masculino",
-                                     TRUE~"Feminino"))) %>%
+  srvyr::filter(V2009>=18) %>%
   # Informar o grupo que queremos a informação
-  srvyr::group_by(E04) %>%
+  srvyr::group_by(UF) %>%
   # Calcular o total e o Percentual da população, com seu intervalo de confiança
   srvyr::summarise(n=survey_total(vartype = "ci"),
                    # Calcular o percentual da população
@@ -1642,77 +1713,47 @@ amostra %>%
 
 Note que, desta vez, não foi preciso criar um contador. Quando utilizamos a função de agrupamento de um fator, seguida da função de sumarização, os totais e percentuais são calculados sem a necessidade de informar o argumento.
 
-Vamos calcular a renda domiciliar nominal e real para  Distrito Federal, agora considerando a expansão do resultado. Mas, antes, precisamos declarar o plano amostra de domicílios. Nesta edição, diferentemente da edição de 2018, existe uma expansão exclusiva para os domicílios. Para tanto, utilizaremos somente uma informação por domicílio, utilizando como filtro o responsável pelo domicílio. Cada domicílio tem apenas um responsável, que, no caso da PDAD 2021, nada mais é que a pessoa com a qual se constrói as relações de parentesco e convivência dentro do domicílio (variável `E05`).
+Vamos calcular a rendimento do trabalho nominal e real para o Brasil, sem considerar e considerando a expansão dos resultados. 
+
 
 ```{r}
-# Fazer o desenho de domicílios
-amostra_dom <- survey::svydesign(id = ~A01nficha, # Identificador do domicílio
-                                 strata = ~A01setor, # Identificação do estrato
-                                 weights = ~PESO_PRE, # Inverso da fração amostral
-                                 nest=TRUE,  #Parâmetro de tratamento para os IDs dos estratos
-                                 data=pdad %>%
-                                   dplyr::filter(E05==1) # Base de dados, pegando apenas uma informação por domíclio.
-                                 )
-
-#Criar um objeto para pós estrato
-post.pop <- pdad %>%
-  dplyr::filter(E05==1) %>% # Filtrar somente para uma obervação
-  dplyr::group_by(A01setor) %>% # Agruprar por estrato
-  dplyr::summarise(Freq=first(TOT_DOM)) %>% # Pegar uma única informação do total de domicílios no estrato
-  dplyr::ungroup() # Desgrupar a base
-
-# Declarar o objeto de pós-estrato
-amostra_dom <- survey::postStratify(amostra_dom,~A01setor,post.pop)
-
-# Criar objeto para calcular os erros por bootstrap (Rao and Wu’s(n − 1) bootstrap)
-amostra_dom <- survey::as.svrepdesign(amostra_dom, type = "subbootstrap")
-
-# Criar o objeto amostra ddo tipo tibble
-amostra_dom <- srvyr::as_survey(amostra_dom)
-```
-
-Feito isso, vamos calcular os resultados.
-
-```{r}
-amostra_dom %>%
-  # Retirar os valores zerados
-  srvyr::filter(renda_dom!=0) %>% 
+pnad_design %>%
   # Calcular a renda domiciliar real média do DF
-  srvyr::summarise(renda_dom_real=survey_mean(renda_dom_real,na.rm=T,vartype="ci"),
-                   renda_dom=survey_mean(renda_dom,na.rm=T,vartype="ci"))
+  srvyr::summarise(renda_real=survey_mean(VD4020*inflacao_br,na.rm=T,vartype="ci"),
+                   renda=survey_mean(VD4020,na.rm=T,vartype="ci"))
+
+# Renda sem expansão
+mean(pnadc$VD4020,na.rm=T)
 ```
 
 ```{r, include=F}
-rnd<-
-amostra_dom %>%
-  # Retirar os valores zerados
-  srvyr::filter(renda_dom!=0) %>% 
+rnd<-pnad_design %>%
   # Calcular a renda domiciliar real média do DF
-  srvyr::summarise(renda_dom_real=survey_mean(renda_dom_real,na.rm=T,vartype="ci"),
-                   renda_dom=survey_mean(renda_dom,na.rm=T,vartype="ci")) %>%
+  srvyr::summarise(renda_real=survey_mean(VD4020*inflacao_br,na.rm=T,vartype="ci"),
+                   renda=survey_mean(VD4020,na.rm=T,vartype="ci"))
   round()
 ```
 
 
-Por essa metodologia, a renda domiciliar nominal estimada foi de R\$ `r rnd[[1,"renda_dom"]]`, com intervalo de R\$ `r rnd[[1,"renda_dom_low"]]` e R\$ `r rnd[[1,"renda_dom_upp"]]`. Em termos reais (Dezembro/2021), o valor estimado é de R\$ `r rnd[[1,"renda_dom_real"]]`, com intervalo de R\$ `r rnd[[1,"renda_dom_real_low"]]` a R\$ `r rnd[[1,"renda_dom_real_upp"]]`.
+Por essa metodologia, a renda nominal estimada foi de R\$ `r rnd[[1,"renda"]]`, com intervalo de R\$ `r rnd[[1,"renda_low"]]` e R\$ `r rnd[[1,"renda_upp"]]`. Em termos reais (maio/2023), o valor estimado é de R\$ `r rnd[[1,"renda_real"]]`, com intervalo de R\$ `r rnd[[1,"renda_real_low"]]` a R\$ `r rnd[[1,"renda_real_upp"]]`. Sem expansão, ou seja, a renda amostral, foi de R\$ `r mean(pnadc$VD4020,na.rm=T) %>% round()`.
 
 ## Outras manipulações recorrentes
 
-Vamos agora elencar algumas variáveis para construirmos um pequeno relatório. Vamos construir gráficos e tabelas para: população, por faixa etária e sexo; distribuição do rendimento do trabalho (nominal), por faixas; e tipo de esgotamento sanitário do domicílio. E montar um mini relatório com essas informações.
+Vamos agora elencar algumas variáveis para construirmos um pequeno relatório. Vamos construir gráficos e tabelas para: população, por faixa etária e sexo; distribuição do rendimento do trabalho (nominal), por faixas; e número de moradores no domicílio. E montar um mini relatório com essas informações.
 
-As informações serão criadas com a função `mutate()`, as faixas de idade e de rendimento serão criadas com auxílio da função `cut()`. Ao final, utilizaremos a função `mutate_if()` para transformar as variáveis do tipo *caracter* em fator e, por fim, utilizaremos a função `select()` para selecionar as variáveis desejadas. Para criar as faixas de rendimento, consideraremos o número de salários mínimos, vigente em 2021.
+As informações serão criadas com a função `mutate()`, as faixas de idade e de rendimento serão criadas com auxílio da função `cut()`. Ao final, utilizaremos a função `mutate_if()` para transformar as variáveis do tipo *character* em fator e, por fim, utilizaremos a função `select()` para selecionar as variáveis desejadas. Para criar as faixas de rendimento, consideraremos o número de salários mínimos, vigente em 2023.
 
 ```{r}
 # Criar um objeto com o salário mínimo em 2021
-sm <- 1100
+sm <- 1320
 
 # Criar um objeto com as variáveis de interesse
-vars_relatorio <- amostra %>%
+vars_relatorio <- pnad_design %>%
   # Criar variável de sexo
-  srvyr::mutate(sexo=case_when(E04==1~"Masculino",
-                               E04==2~"Feminino"),
+  srvyr::mutate(sexo=case_when(V2007==1~"Homem",
+                               V2007==2~"Mulher"),
                 # Criar variável de faixas de idade
-                idade_faixas=cut(idade,
+                idade_faixas=cut(V2009,
                                  breaks = c(-Inf,seq(4,74,by=5),Inf),
                                  labels = c("0 a 4 anos","5 a 9 anos",
                                             "10 a 14 anos","15 a 19 anos",
@@ -1724,54 +1765,51 @@ vars_relatorio <- amostra %>%
                                             "70 a 74 anos","Mais de 75 anos"),
                                  ordered_result = T),
                 # Criar variável de faixas de salário do trabalho principal
-                faixas_salario=cut(case_when(I20 %in% c(77777,88888,99999)~NA_real_,
-                                             TRUE~as.numeric(I20)),
+                faixas_salario=cut(VD4020,
                                    breaks = c(-Inf,sm,2*sm,4*sm,10*sm,20*sm,Inf),
                                    labels = c("Até 1 salário","Mais de 1 até 2 salários",
                                               "Mais de 2 até 4 salários",
                                               "Mais de 4 até 10 salários",
                                               "Mais de 10 até 20 salários",
                                               "Mais de 20 salários")),
-                # Criar variável para as RAs
-                RA=factor(A01ra,
-                            levels=1:33,
-                            labels=c('Plano Piloto',      
-                                     'Gama',
-                                     'Taguatinga',
-                                     'Brazlândia',
-                                     'Sobradinho',
-                                     'Planaltina',
-                                     'Paranoá',
-                                     'Núcleo Bandeirante',
-                                     'Ceilândia',
-                                     'Guará',
-                                     'Cruzeiro',
-                                     'Samambaia',
-                                     'Santa Maria',
-                                     'São Sebastião',
-                                     'Recanto das Emas',
-                                     'Lago Sul',
-                                     'Riacho Fundo',
-                                     'Lago Norte',
-                                     'Candangolândia',
-                                     'Águas Claras',
-                                     'Riacho Fundo II',
-                                     'Sudoeste/Octogonal',
-                                     'Varjão',
-                                     'Park Way',
-                                     'SCIA-Estrutural',
-                                     'Sobradinho II',
-                                     'Jardim Botânico',
-                                     'Itapoã',
-                                     'SIA',
-                                     'Vicente Pires',
-                                     'Fercal',
-                                     'Sol Nascente/Pôr do Sol',
-                                     'Arniqueira'))) %>%
+                # Criar variável para as UFs
+                UF=factor(UF,
+                             levels=c(11:17,
+                                      21:29,
+                                      31:33,35,
+                                      41:43,
+                                      50:53),
+                             labels=c('Rondônia',
+                                      'Acre',
+                                      'Amazonas',
+                                      'Roraima',
+                                      'Pará',
+                                      'Amapá',
+                                      'Tocantins',
+                                      'Maranhão',
+                                      'Piauí',
+                                      'Ceará',
+                                      'Rio Grande do Norte',
+                                      'Paraíba',
+                                      'Pernambuco',
+                                      'Alagoas',
+                                      'Sergipe',
+                                      'Bahia',
+                                      'Minas Gerais',
+                                      'Espírito Santo',
+                                      'Rio de Janeiro',
+                                      'São Paulo',
+                                      'Paraná',
+                                      'Santa Catarina',
+                                      'Rio Grande do Sul',
+                                      'Mato Grosso do Sul',
+                                      'Mato Grosso',
+                                      'Goiás',
+                                      'Distrito Federal'))) %>%
   # Transformar em fator variáveis do tipo character
   srvyr::mutate_if(is.character,list(~factor(.))) %>%
   # Selecionar as variáveis criadas e algumas variáveis auxiliares
-  srvyr::select(RA,E05,idade,I05,sexo,idade_faixas,faixas_salario)
+  srvyr::select(UF,sexo,idade_faixas,faixas_salario)
 ```
 
 Criado esse objeto auxiliar com as variáveis desejadas, vamos calcular os totais para cada um dos grupos, juntamente com seus intervalos de confiança. Para isso, vamos utilizar as funções `group_by()`, para conseguirmos agrupar os dados pelas categorias desejadas e a função `summarise()`, que calculará os totais ou proporções para cada grupo. Os intervalos de confiança são calculados com a função `vartype="ci"`. 
@@ -1792,21 +1830,21 @@ piramide_grafico <- piramide %>%
   # inferiores e superiores
   ggplot(aes(x=idade_faixas,y=n, fill=sexo, ymin=n_low,ymax=n_upp))+
   # Fazer o gráfico de barras para o sexo Feminino
-  geom_bar(data = dplyr::filter(piramide, sexo == "Feminino"),
+  geom_bar(data = dplyr::filter(piramide, sexo == "Mulher"),
            stat = "identity") +
   # Fazer o gráfico de barras para o sexo Masculino
-   geom_bar(data = dplyr::filter(piramide, sexo == "Masculino"),
+   geom_bar(data = dplyr::filter(piramide, sexo == "Homem"),
            stat = "identity",
            position = "identity",
            # Negativar os valores para espelhar no eixo
            mapping = aes(y = -n))+
   # Plotar os erros para o sexo Masculino, negativando os valores para espelhar o eixo
-  geom_errorbar(data = dplyr::filter(piramide, sexo == "Masculino"),
+  geom_errorbar(data = dplyr::filter(piramide, sexo == "Homem"),
                 mapping = aes(ymin = -n_low,ymax=-n_upp),
                   width=0,
                 color="black")+
   # Plotar os erros para o sexo Feminino
-    geom_errorbar(data = dplyr::filter(piramide, sexo == "Feminino"),
+    geom_errorbar(data = dplyr::filter(piramide, sexo == "Mulher"),
                   width=0,
                 color="black")+
   # Inverter os eixos, fazendo com que o gráfico de colunas verticais fique
@@ -1833,6 +1871,7 @@ Para construir o gráfico com os salários, os passos são análogos aos realiza
 ```{r}
 # Construir um objeto com as informações de salário
 salario <- vars_relatorio %>%
+  dplyr::filter(is.na(faixas_salario)==F) %>% 
   # Agrupar por faixas de salário
   srvyr::group_by(faixas_salario) %>%
   # Calcular os totais para cada grupo de salário
@@ -1847,7 +1886,7 @@ salario_grafico <- salario %>%
   # Construir o gráfico de barras
   geom_bar(stat = "identity") +
   # Construir as barras de erro
-  geom_errorbar(aes(ymin=n_low,ymax=n_upp,size=4, width=0), color="darkred")+
+  geom_errorbar(aes(ymin=n_low,ymax=n_upp,linewidth=4, width=0), color="darkred")+
   # Inverter os eixos
   coord_flip()+
   # Suprimir o nome dos eixos
@@ -1865,7 +1904,7 @@ salario_grafico
 ```
 
 
-Caso o desejo fosse saber a situação de salários por RA, poderíamos fazer isso facilmente com a função `facet_wrap()`. Vamos ver como funciona, agora calculando o percentual de pessoas em cada faixa de rendimento, para as 33 RAs.
+Caso o desejo fosse saber a situação de salários por UF, poderíamos fazer isso facilmente com a função `facet_wrap()`. Vamos ver como funciona, agora calculando o percentual de pessoas em cada faixa de rendimento, para as 27 UFs.
 
 ```{r, fig.height=12, fig.width=8}
 # Carregar o pacote Scales
@@ -1874,9 +1913,10 @@ library(scales)
 # Construir o objeto com os valores
 salario2 <- vars_relatorio %>%
   # Filtrar somente para casos válidos
-  srvyr::filter(is.na(faixas_salario)==FALSE) %>% 
+  srvyr::filter(is.na(faixas_salario)==FALSE,
+                str_sub(UF,1,1)==4) %>% 
   # Agrupar por RA e faixas de salário
-  srvyr::group_by(RA,faixas_salario) %>%
+  srvyr::group_by(UF,faixas_salario) %>%
   # Calcular as proporções por faixa de salário
   srvyr::summarise(n=survey_mean(na.rm=T,vartype = "ci")) %>% 
   # Retirar NA
@@ -1899,7 +1939,7 @@ salario2 %>%
   # Ajustar as formatações de escala
   scale_y_continuous(labels = scales::percent)+
   # Plotar o gráfico para cada uma das RAs, divididas em 4 colunas
-  facet_wrap(.~RA, ncol=4)
+  facet_wrap(.~UF, ncol=4)
 ```
 
 
@@ -1907,21 +1947,23 @@ Para o último gráfico, como estamos realizando uma estatística para o domicí
 
 ```{r}
 # Construir o objeto com o esgotamento sanitário
-esgotamento <- amostra_dom %>%
-  srvyr::mutate(# Criar variável de esgotamento sanitário
-                esgotamento_caesb=factor(case_when(B14_1==1~"Com Rede Geral (Caesb)",
-                                                   B14_1==2~"Sem Rede Geral (Caesb)"))) %>% 
+nmor <- pnad_design %>%
+  srvyr::filter(V2005==1) %>% 
+  srvyr::mutate(# Criar variável para o número de pessoas no domicílio
+                nmor=factor(case_when(V2001==1~"Unipessoal",
+                                      V2001==2~"2 pessoas",
+                                      V2001==3~"3 pessoas",
+                                      V2001==4~"4 pessoas",
+                                      V2001>=5~"5 ou mais pessoas"))) %>% 
   # Agrupar por situação de esgotamento sanitário
-  srvyr::group_by(esgotamento_caesb) %>%
+  srvyr::group_by(nmor) %>%
   # Calcular a proporção de cada grupo
   srvyr::summarise(n=survey_mean(na.rm = T,vartype = "ci"))
 
 # Construir o objeto com o gráfico
-esgotamento_grafico <- esgotamento %>%
-  # filtrar para valores válidos
-  srvyr::filter(is.na(esgotamento_caesb)==FALSE) %>% 
+nmor_grafico <- nmor %>%
   # Plotar os eixos x e y, reordenando os fatores, do maior para o menor resultado
-  ggplot(aes(x=fct_reorder(esgotamento_caesb,-n),y=n,ymin=n_low,ymax=n_upp))+
+  ggplot(aes(x=fct_reorder(nmor,-n),y=n,ymin=n_low,ymax=n_upp))+
   # Construir o gráfico de barras
   geom_bar(stat = "identity")+
   # Construir os erros
@@ -1949,16 +1991,18 @@ Vamos ver como fazer um gráfico de setores, com as mesmas informações anterio
 library(ggrepel)
 
 # Construir o objeto com as informações de esgotamento sanitário
-esgotamento2 <- amostra_dom %>%
-  srvyr::mutate(# Criar variável de esgotamento sanitário
-                esgotamento_caesb=factor(case_when(B14_1==1~"Com Rede Geral (Caesb)",
-                                                   B14_1==2~"Sem Rede Geral (Caesb)"))) %>% 
-  # Filtar para o responsável
-  srvyr::filter(is.na(esgotamento_caesb)==FALSE) %>%
-  # Agrupar por tipo de esgotamento
-  srvyr::group_by(esgotamento_caesb) %>%
-  # Calcular as proporções
-  srvyr::summarise(n=survey_mean(na.rm = T,vartype = "ci")) %>%
+nmor2 <- pnad_design %>%
+  srvyr::filter(V2005==1) %>% 
+  srvyr::mutate(# Criar variável para o número de pessoas no domicílio
+                nmor=factor(case_when(V2001==1~"Unipessoal",
+                                      V2001==2~"2 pessoas",
+                                      V2001==3~"3 pessoas",
+                                      V2001==4~"4 pessoas",
+                                      V2001>=5~"5 ou mais pessoas"))) %>% 
+  # Agrupar por situação de esgotamento sanitário
+  srvyr::group_by(nmor) %>%
+  # Calcular a proporção de cada grupo
+  srvyr::summarise(n=survey_mean(na.rm = T,vartype = "ci")) %>% 
   # Deixar as informações em ordem decrescente
   dplyr::arrange(-n) %>%
   # Construir uma variável auxiliar, com a posição do label
@@ -1982,11 +2026,11 @@ tema_branco <- theme_minimal()+
     # Retirar os ticks
     axis.ticks = element_blank())
 
-# Construir o gráfico de pizza
-esgotamento2 %>%
+# Construir o gráfico de setores
+nmor2 %>%
   # Plotar o gráfico, com as quantidades no eixo y, o preenchimento com as categorias,
   # reordenando as quantudades, e o valor 1 para travar o eixo x
-  ggplot(aes(x=1,y=n,fill=fct_reorder(esgotamento_caesb,n)))+
+  ggplot(aes(x=1,y=n,fill=fct_reorder(nmor2,n)))+
   # Construir as "barras"
   geom_bar(stat="identity")+
   # Transformar em coordenada polar o eixo y, com início em 0
@@ -2006,17 +2050,18 @@ esgotamento2 %>%
 Alternativamente ao gráfico de setores, podemos fazer um gráfico de coluna agrupada, que fornece o mesmo tipo de informação para este caso.
 
 ```{r}
-# Construir o objeto com as informações de esgotamento sanitário
-amostra_dom %>%
-  srvyr::mutate(# Criar variável de esgotamento sanitário
-                esgotamento_caesb=factor(case_when(B14_1==1~"Com Rede Geral (Caesb)",
-                                                   B14_1==2~"Sem Rede Geral (Caesb)"))) %>% 
-  # Filtar para o responsável
-  srvyr::filter(is.na(esgotamento_caesb)==FALSE) %>%
-  # Agrupar por tipo de esgotamento
-  srvyr::group_by(esgotamento_caesb) %>%
-  # Calcular as proporções
-  srvyr::summarise(n=survey_mean(na.rm = T,vartype = "ci")) %>%
+pnad_design %>%
+  srvyr::filter(V2005==1) %>% 
+  srvyr::mutate(# Criar variável para o número de pessoas no domicílio
+                nmor=factor(case_when(V2001==1~"Unipessoal",
+                                      V2001==2~"2 pessoas",
+                                      V2001==3~"3 pessoas",
+                                      V2001==4~"4 pessoas",
+                                      V2001>=5~"5 ou mais pessoas"))) %>% 
+  # Agrupar por situação de esgotamento sanitário
+  srvyr::group_by(nmor) %>%
+  # Calcular a proporção de cada grupo
+  srvyr::summarise(n=survey_mean(na.rm = T,vartype = "ci")) %>% 
   # Gerar uma área de plotage,
   ggplot()+
   # Gerar a geometria da barra
@@ -2065,7 +2110,7 @@ Muitas vezes não precisamos salvar todo o nosso diretório e queremos apenas sa
 ```{r}
 # Salvar os objetos no formato RDS
 saveRDS(piramide,"dados/piramide.rds")
-saveRDS(esgotamento,"dados/esgotamento.rds")
+saveRDS(mor,"dados/nmor.rds")
 saveRDS(salario,"dados/salario.rds")
 ```
 
@@ -2089,12 +2134,12 @@ Os códigos de R podem ser inseridos juntamente com os textos, dentro de acentos
 
 
 ```{r}
-# `r rnow(pdad_2021_moradores)` Isto é um código r dentro de um texto markdown
+# `r rnow(pnadc)` Isto é um código r dentro de um texto markdown
 
 # Abaixo temos um exemplo de chunk
 
 #```{r}
-# table(pdad_2021_moradores$A01ra)
+# table(pnadc$UF)
 #```
 
 ```
@@ -2121,7 +2166,7 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 
 ```{r,eval=FALSE}
 # ---
-# title: "Mini relatório da PDAD 2021"
+# title: "Mini relatório da PNADC"
 # author: "Thiago Mendes Rosa"
 # date: "`r Sys.Date()`"
 # output:
@@ -2151,13 +2196,13 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 # library(kableExtra)
 # ```
 # 
-# # PDAD 2021
+# # PNADC - 1º Trimestre de 2023
 # 
-# A PDAD 2021 visitou **`r nrow(pdad_2021_domicilios)`** domicílios e coletou informações de `r nrow(pdad_2021_moradores)` moradores.
+# A PNADC visitou **`r nrow(pnadc[pnadc$V2005==1,])`** domicílios e coletou informações de `r nrow(pnadc)` moradores.
 # 
 # ## Estrutura etária
 # 
-# A estrutura etária dos moradores do Distrito Federal é apresentada  Figura \ref{fig:piramide}.
+# A estrutura etária dos moradores do Brasil é apresentada  Figura \ref{fig:piramide}.
 # 
 # ```{r piramide, fig.cap="Pirâmide etária",out.extra=''}
 # piramide_grafico
@@ -2176,14 +2221,14 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #  kableExtra::kable_styling(latex_options = c("HOLD_position"),
 #                            full_width=T) %>%
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PDAD 2021",
+#                       general="Fonte: PNADC 2023 - 1º Tri",
 #                       fixed_small_size=T)
 # ```
 # \clearpage
 # 
 # ## Salários
 # 
-# No que diz respeito aos salários, sua distribuição por faixas de salário mínimo^[O salário considerado foi de R$ 1.100,00] é apresentada  Figura \ref{fig:salarios}.
+# No que diz respeito aos salários, sua distribuição por faixas de salário mínimo^[O salário considerado foi de R$ 1.320,00] é apresentada  Figura \ref{fig:salarios}.
 # 
 # ```{r salarios, fig.cap="Salarios por faixa de SM",out.extra=''}
 # salario_grafico
@@ -2203,24 +2248,24 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #                             full_width=T) %>%
 #   kableExtra::column_spec(1,width = "5cm") %>% 
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PDAD 2021",
+#                       general="Fonte: PNADC 2023 - 1º Tri",
 #                       fixed_small_size=T)
 # ```
 # \clearpage
 # \pagebreak
 # 
-# ## Esgotamento
+# ## Número de moradores por domicílio
 # 
-# Por fim, o esgotamento sanitário é apresentado na Figura \ref{fig:esgotamento}
+# Por fim, a distribuição do número de moradores é apresentada na Figura \ref{fig:nmor}
 # 
-# ```{r esgotamento, fig.cap="Esgotamento sanitário",out.extra=''}
+# ```{r nmor, fig.cap="Esgotamento sanitário",out.extra=''}
 # esgotamento_grafico
 # ```
 # 
-# Os números podem ser consultados na Tabela \ref{tab:esgotamento.tab}.
+# Os números podem ser consultados na Tabela \ref{tab:nmor.tab}.
 # 
-# ```{r esgotamento.tab, results='asis'}
-# esgotamento %>% 
+# ```{r nmor.tab, results='asis'}
+# nmor %>% 
 # knitr::kable("latex",
 #             caption="Esgotamento sanitário",
 #             booktabs = T,
@@ -2231,7 +2276,7 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #                             full_width=T) %>%
 #   kableExtra::column_spec(1,width = "6cm") %>% 
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PDAD 2021",
+#                       general="Fonte: PNADC 2023 - 1º Tri",
 #                       fixed_small_size=T)
 # ``` 
 
@@ -2270,7 +2315,7 @@ Pronto! Seus scripts e arquivos já estão armazenados e versionados no Github. 
 
 # Encerramento
 
-Esse foi o mini-curso de R aplicado à PDAD. O R é uma ferramenta muito ampla, que permite diversas outras aplicações, principalmente na área estatística. Aqui foi apresentada uma modesta parcela das funcionalidades que esta ferramenta pode oferecer. Ainda há muito mais a ser explorado. Utilizar o R constantemente fará com que você acumule habilidades e avance cada vez mais na utilização desta ferramenta. O começo pode parecer desafiador, mas, uma vez rompida a barreira inicial, o avanço se torna natural e prazeroso.
+Esse foi o mini-curso de R aplicado à PNADC O R é uma ferramenta muito ampla, que permite diversas outras aplicações, principalmente na área estatística. Aqui foi apresentada uma modesta parcela das funcionalidades que esta ferramenta pode oferecer. Ainda há muito mais a ser explorado. Utilizar o R constantemente fará com que você acumule habilidades e avance cada vez mais na utilização desta ferramenta. O começo pode parecer desafiador, mas, uma vez rompida a barreira inicial, o avanço se torna natural e prazeroso.
 
 Abaixo você tem uma lista de aplicações analíticas sendo realizadas atualmente com o auxílio do R, segundo o blog [revolution analytics](http://blog.revolutionanalytics.com/2012/07/a-big-list-of-the-things-r-can-do.html).
 
@@ -2303,7 +2348,7 @@ Aplicações em R e Extensões ***
 - Mineração de dados
 - Metodologia estatística 
 
-Qualquer dúvida, mande um e-mail para [thiago.rosa@codeplan.df.gov.br](thiago.rosa@codeplan.df.gov.br).
+Qualquer dúvida, mande um e-mail para [thiago.rosa@ipea.gov.br](thiago.rosa@ipea.gov.br).
 
 <img src="figuras/download.jpg" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 

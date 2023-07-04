@@ -23,8 +23,6 @@ fontsize: 12pt
 
 Thiago Mendes Rosa - DIRUR/COMEQ
 
-Telefone: 61 3342-2272
-
 E-mail: \url{thiago.rosa@ipea.gov.br}
 
 \bigskip
@@ -101,4 +99,10 @@ O material completo do curso está disponível em:
     - Visualização de dados com `ggplot2`
     - Elaboração de relatórios com o `RMarkdown`
     - Utilização do Github com o RStudio Server para controle e versionamento de projetos
+
+\bigskip
+
+- Bônus
+    - Extração de informações do Sidra (IBGE) diretamente no R
+    - Extração de informações do IPEA Data diretamente no R
     
