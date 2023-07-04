@@ -9,7 +9,7 @@ title: |
 author: "Thiago Mendes Rosa"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 output:
-  html_document: rmdformats::downcute
+  html_document: rmdformats::readthedown
     # highlighting: tango
     # number_sections: yes
     # theme: flatly
@@ -22,10 +22,10 @@ fontsize: 18pt
 description: Minicurso de R aplicado a manipulação de microdados da PNADC
 ---
 
-```{r, echo=F}
-library(knitr)
-library(stringr)
-library(forcats)
+```{r, echo=F,warning=FALSE, message=FALSE}
+suppressWarnings(suppressMessages(library(knitr)))
+suppressWarnings(suppressMessages(library(stringr)))
+suppressWarnings(suppressMessages(library(forcats)))
 
 # Definir opções dos chunks
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
