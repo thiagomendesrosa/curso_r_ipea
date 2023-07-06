@@ -9,7 +9,8 @@ title: |
 author: "Thiago Mendes Rosa"
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 output:
-  html_document: rmdformats::readthedown
+  html_document: rmdformats::downcute
+  downcute_theme: "chaos"
     # highlighting: tango
     # number_sections: yes
     # theme: flatly
@@ -23,9 +24,9 @@ description: Minicurso de R aplicado a manipulação de microdados da PNADC
 ---
 
 ```{r, echo=F,warning=FALSE, message=FALSE}
-suppressWarnings(suppressMessages(library(knitr)))
-suppressWarnings(suppressMessages(library(stringr)))
-suppressWarnings(suppressMessages(library(forcats)))
+library(knitr)
+library(stringr)
+library(forcats)
 
 # Definir opções dos chunks
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
@@ -71,6 +72,8 @@ Esse curso foi baseado nos cursos [R pragmático](https://curso-r.github.io/ragm
 - Transformação de dados com `dplyr` e `tidyr`;
 - Visualização de dados com `ggplot2`;
 - Elaboração de mapas com auxílio do pacote `sf`;
+- Atualização de valores monetários utilizando o pacote `sidrar`;
+- Acesso aos dados do ipea data no R, com o pacote `ipeadatar`;
 - Utilização dos pacotes `survey` e `srvyr` para pesquisas amostrais;
 - Elaboração de relatórios com o `Rmarkdown`.
 
@@ -148,6 +151,8 @@ Atualmente, o banco conta com as seguintes informações:
 - PIB municipal
 - Comparecimento eleitoral
 - Contas anuais estaduais
+- Pagamentos e beneficioários do Bolsa Família e do BPC
+- Aeródromos brasileiros
 
 As informações armazenadas no banco de dados podem ser facilmente carregadas pelo R (ou na maioria dos demais pacotes estatístico, como STATA ou SAS), por conexão ODBC -- acrônimo para *Open Database Connectivity*. O RStudio server já está configurado para fazer esta conexão, enquanto as máquinas locais podem ser facilmente configuradas seguindo [esses passos](https://www.sqlshack.com/configure-odbc-drivers-for-postgresql/). As bases podem ser acessadas com os pacotes `RODBC` ou `DBI`, através de consultas SQL (*Structured Query Language*), que nada mais é que uma linguagem estruturada para realizar consultas em bancos de dados.
 
@@ -684,18 +689,18 @@ Por fim, uma boa e velha máquina de buscas é fundamental. Quase todas as repos
 
 # Carga de um arquivo .csv
 
-Vamos iniciar a atividade de manipulação de base de dados carregando um arquivo .csv encontrado na internet. Vamos trabalhar o estoque do Tesouro Direto, disponível no site do Tesouro Transparente, [nesse link](https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv).
+Vamos iniciar a atividade de manipulação de base de dados carregando um arquivo `.csv` encontrado na internet. Vamos trabalhar o estoque do Tesouro Direto, disponível no site do Tesouro Transparente, [nesse link](https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv).
 
-Vamos carregar a pesquisa de duas maneiras: utilizando os atalhes do botão do RStudio e por linha de comando, utilizando o pacote `data.table`.
+Vamos carregar a pesquisa de duas maneiras: utilizando os atalhos do botão do RStudio e por linha de comando, utilizando o pacote `data.table`.
 
 
-Vamos criar um projeto para fazermos nossas análises. Acesse sua conta no [github](https://github.com/) e crie um novo repositório. Depois disso, vamos criar um novo projeto no RStudio server. Para isso, clique em `File` -> `New project` -> `Version Control` ->`Git`. No campo `Repository URL`, cole a url do projeto que você acabou de criar. 
+Antes, vamos criar um projeto para fazermos nossas análises. Acesse sua conta no [github](https://github.com/) e crie um novo repositório. Depois disso, vamos criar um novo projeto no RStudio server. Para isso, clique em `File` -> `New project` -> `Version Control` ->`Git`. No campo `Repository URL`, cole a url do projeto que você acabou de criar. 
 
 <img src="figuras/git.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
 *Atenção*: você pode copiar o link `HTTPS` ou `SSH` do projeto na página do [github](https://github.com/). Para um tutorial de como utilizar autenticação por chave `SSH` no RStudio, acesse [esse site](https://happygitwithr.com/ssh-keys.html).
 
-Agora que o projeto do nosso curso foi criado, vamos carregar o arquivo baixado no servidor onde o RStudio está instalado. Crie uma pasta chamada `dados` e salve o com as informações das tranferências estaduais dentro dela.
+Agora que o projeto do nosso curso foi criado, vamos carregar o arquivo baixado no servidor onde o RStudio está instalado. Crie uma pasta chamada `dados` e salve o arquivo do Tesouro Direto dentro dela.
 
 <img src="figuras/carregar.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
@@ -723,7 +728,7 @@ Feito isso, vamos agora carregar os dados no R de diferentes métodos.
 
 ## Método point-and-click
 
-Para isso, clique em `Import Dataset`, no atalho do painel `Environment`, na opção `From Text(readr)`. Temos duas opções: informar o local do arquivo que você baixou ou o link onde ele está hospedado. No nosso caso, é o mesmo endereço em que baixamos os dados do [estoque do Tesouro Direto](https://dados.gov.br/dados/conjuntos-dados/estoque-do-tesouro-direto), diretamente o arquivo [.csv](https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv). Vamos informar o link, para tornar o processo mais rápido.
+Para isso, clique em `Import Dataset`, no atalho do painel `Environment`, na opção `From Text(readr)`. Temos duas opções: informar o local do arquivo que você baixou ou o link onde ele está hospedado. No nosso caso, é o mesmo endereço em que baixamos os dados do [estoque do Tesouro Direto](https://dados.gov.br/dados/conjuntos-dados/estoque-do-tesouro-direto), usando o arquivo [.csv](https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv). Vamos informar o link, para tornar o processo mais rápido.
 
 <img src="figuras/import2.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
@@ -741,11 +746,20 @@ EstoqueTesouroDireto <- read_delim("https://www.tesourotransparente.gov.br/ckan/
 Você poderia carregar os dados, de ambas as maneiras, diretamente pela linha de comando, de outras formas. Um outro pacote, bastante útil e veloz para o carregamento de dados, é o `data.table`. Vamos treinar o carregamento dos dados pela linha de comando com ele. Para isso, vamos antes limpar o ambiente, excluindo os objetos carregados anteriormente, com a função `rm()`. 
 
 ```{r}
-rm(EstoqueTesouroDireto) # Remove apenas o objeto "pdad_2021_moradores"
+rm(EstoqueTesouroDireto) # Remove apenas o objeto "EstoqueTesouroDireto"
 rm(list=ls()) # Remove todos os objetos do ambiente
 ```
 
-Note que você pode excluir todos os objetos do ambiente, listando-os com a função `ls()`. Vamos também definir o diretório padrão em que estamos trabalhando. O RStudio server, por padrão, utilizará a pasta do seu usuário no servidor. Para consultar o diretório ativo no momento, utilize a função `getwd()`.
+
+Note que você pode excluir todos os objetos do ambiente, listando-os com a função `ls()`. Contudo, os arquivos excluídos serão somente aqueles carregados no âmbiente global. Muitas vezes, objetos carregados em outros ambientes podem continuar carregados, consumindo a memória do computador. Utilize a função `gc()` para fazer uma limpeza na memória.
+
+```{r}
+gc()
+```
+
+Mesmo com esses dois procedimentos, o R não fica completamente "limpo". Por exemplo, todos os pacotes carregados na sessão permanecem prontos para uso, também consumindo memória. Para eliminar todos os objetos de todos os ambientes, será recessário iniciar uma nova sessão Para fazer isso, você pode clicar no botão vermelho do canto superior direito (liga/desliga) ou utilizar o atalho de teclado `crtl`+`shift`+`F10`.
+
+Vamos também definir o diretório padrão em que estamos trabalhando. O RStudio server, por padrão, utilizará a pasta do seu usuário no servidor. Para consultar o diretório ativo no momento, utilize a função `getwd()`.
 
 ```{r}
 getwd() # Consultar diretório de trabalho ativo
@@ -781,25 +795,20 @@ EstoqueTesouroDireto <- data.table::fread("https://www.tesourotransparente.gov.b
                                          data.table = FALSE,
                                          integer64 = "character")
 
-# Baixar arquivo
-# download.file("https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv",
-#               destfile = "dados/EstoqueTesouroDireto.csv",
-#               mode = "wb")
-
 # Carregar a base de um arquivo local
 EstoqueTesouroDireto <- data.table::fread("dados/EstoqueTesouroDireto.csv",
-                                    dec = ".",encoding = "Latin-1",
+                                    dec = ",",encoding = "Latin-1",
                                           data.table = FALSE,
                                          integer64 = "character")
 ```
 
-Com a função `fread()` é possível carregar a base de ambas as maneiras vistas anteriormente. Note que a função `fread()` detectou o delimitador automaticamente. Informamos apenas que o separador decimal da nossa base é a vírgula, com a opção `dec=","` e que o enconding do arquivo é `enconding=Latin-1`. Essa última opção é importante quando estamos transitando arquivos salvos em diferentes plataformas, principalmente entre Windows e Linux, que possuem formas distintas de tratar caracteres especiais. O parâmetro `data.table=FALSE` carregará a tabela no formato `data.frame`, ao invés do padrão `data.table`, enquanto o parâmetro `integer64 = "character"` irá tratar número do tipo **Bigint** como character. Neste curso, aprenderemos a trabalhar `data.frames` e `tibbles`, embora exista a possibilidade de se realizar manipulações com o pacote `data.table` de maneira bastante eficiente. Agora que você já aprendeu a carregar a base de moradores, pratique carregando também a base de domicílios.
+Com a função `fread()` é possível carregar a base de ambas as maneiras vistas anteriormente. Note que a função `fread()` detectou o delimitador automaticamente. Informamos apenas que o separador decimal da nossa base é a vírgula, com a opção `dec=","` e que o enconding do arquivo é `enconding=Latin-1`. Essa última opção é importante quando estamos transitando arquivos salvos em diferentes plataformas, principalmente entre Windows e Linux, que possuem formas distintas de tratar caracteres especiais. O parâmetro `data.table=FALSE` carregará a tabela no formato `data.frame`, ao invés do padrão `data.table`, enquanto o parâmetro `integer64 = "character"` irá tratar número do tipo **Bigint** como character. Neste curso, aprenderemos a trabalhar `data.frames` e `tibbles`, embora exista a possibilidade de se realizar manipulações com o pacote `data.table` de maneira bastante eficiente.
 
 ## Carga pelo banco de dados
 
 Para isso, vamos precisar do pacote `DBI`, que fará a nossa conexão com o banco de dados. Isso é feito através da função `dbConnect()`.
 
-O primeiro argumento é o driver necessário para realizar a conexão, fornecido pelo pacote `odbc`. O segundo argumento desta função é o nome do banco de dados, atribuído no momento da configuração da conexão ODBC. No RServer, o nome atribuído foi `comeq`. Este argumento deve ser fornecido entre aspas. Os próximos argumentos são o nome de usuário e senha. Você deve usar as suas credenciais, fornecidas pelo administrador do banco de dados.
+O primeiro argumento é o driver necessário para realizar a conexão, fornecido pelo pacote `odbc`. O segundo argumento desta função é o nome da conexão, atribuída no momento da configuração da conexão ODBC. No RServer, o nome atribuído foi `comeq`. Este argumento deve ser fornecido entre aspas. Os próximos argumentos são o nome de usuário e senha. Você deve usar as suas credenciais, fornecidas pelo administrador do banco de dados.
 
 ```{r}
 # Carregar pacotes
@@ -816,29 +825,29 @@ db <- DBI::dbConnect(odbc::odbc(),
 
 Pronto! Já estamos conectados ao banco de dados. 
 
-IMPORTANTE: sempre que você estiver escrevendo um código, o qual irá posteriormente subir no Github/Gitlab, NUNCA, JAMAIS e EM HIPÓTESE ALGUMA salve seu usuário e senha no script. Isto representa uma grave quebra de segurança, podendo ter importantes repercussões. Utilize umas das três opções: i) sempre preencha manualmente seu usuário e senha; utilize arquivos `.Renviron` com suas credenciais (APENAS EM MÁQUINAS PRIVADAS); utilize o pacote `keyring` para o gerenciamento de credenciais. A solução acima utiliza o arquivo `.Renviron`, que pode ser configurada pelo RStudio com a função `usethis::edit_r_environ()`.
+IMPORTANTE: sempre que você estiver escrevendo um código, o qual irá posteriormente subir no Github/Gitlab, NUNCA, JAMAIS e EM HIPÓTESE ALGUMA salve seu usuário e senha no script. Isto representa uma grave quebra de segurança, podendo ter importantes repercussões. Utilize umas das três opções: i) sempre preencha manualmente seu usuário e senha; utilize o arquivo `.Renviron` com suas credenciais (APENAS EM MÁQUINAS PRIVADAS); utilize o pacote `keyring` para o gerenciamento de credenciais. A solução acima utiliza o arquivo `.Renviron`, que pode ser configurada pelo RStudio com a função `usethis::edit_r_environ()`.
 
 Assim que você fizer a conexão, o pacote já ativa a aba `Connections`, no painel superior direito. 
 
 <img src="figuras/banco_consulta.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
-Por ali, você pode consultar os bancos, esquemas e tabelas disponíveis, bem como as colunas. Para verificar uma prévia com as 1.000 primeiras linhas, basta clicar ícone da tabela desejada. Para consultar as tabelas ou colunas disponíveis (que são retornadas em formato de vetor), utilize as funções abaixo. O argumento destas funções é o objeto com a conexão que fizemos para o banco de dados.
+Por ali, você pode consultar os bancos, esquemas e tabelas disponíveis, bem como as colunas. Para verificar uma prévia com as 1.000 primeiras linhas, basta clicar no ícone da tabela desejada. Para consultar as tabelas ou colunas disponíveis (que são retornadas em formato de vetor), utilize as funções abaixo. O argumento destas funções é o objeto com a conexão que fizemos para o banco de dados.
 
 
 ```{r}
 DBI::dbListTables(db) # Consultar tabelas
 DBI::dbListFields(db,Id(schema="pnadc",
-                        table="pnadt202301")) # Consultar colunas da tabela pib
+                        table="pnadt202301")) # Consultar colunas da tabela pnadt202301
 ```
 
 Feito isso, já estamos pronto para carregar uma base no R. Para isso, vamos utilizar a função `dbGetQuery`. Dentro dessa função, enviamos uma consulta SQL ao banco de dados, da mesma maneira que fazemos em qualquer outro programa de acesso a BD. A única diferença é que o pacote `DBI` estará intermediando a comunicação, apresentando os dados quando pertinente. Por exemplo, caso tenhamos permissão para tal, podemos criar, excluir ou alterar tabelas do banco de dados diretamente do R.
 
-Vamos, então, carregar do pib municipal. A estrutura para realizar uma consulta é bastante simples: dizemos a ação que queremos realizar que, no caso da consulta, é feita com a palavra `select`; informamos as variáveis a serem carregadas, separando-as por vírgulas; dizemos de onde queremos obter esses dados, com a palavra `from`; e informamos o local em que a tabela está armazenada no banco de dados, na estrutura "esquema.tabela", no nosso caso, `pnadc.pnadt202301`.
+Vamos, então, carregar a pnadc trimestral mais recente. A estrutura para realizar uma consulta é bastante simples: dizemos a ação que queremos realizar que, no caso da consulta, é feita com a palavra `select`; informamos as variáveis a serem carregadas, separando-as por vírgulas; dizemos de onde queremos obter esses dados, com a palavra `from`; e informamos o local em que a tabela está armazenada no banco de dados, na estrutura "esquema.tabela", no nosso caso, `pnadc.pnadt202301`.
 
-Como consultamos os nomes das tabelas anteriormente, vamos carregar somente as informações sobre a UF e o peso (variável "V1028") e o número de moradores no domicílio, para realizarmos um pequeno exercício.
+Como consultamos os nomes das tabelas anteriormente, vamos carregar somente as informações sobre a UF,o peso do morador/domicílio (variável "V1028"), a situação do domicílio ("V1022") e o rendimento do trabalho ("VD4020"), para realizarmos um pequeno exercício.
 
 ```{r}
-# Carregar a base de moradores da PDAD 2018
+# Carregar a base de moradores da PNADC
 pnadc <- DBI::dbGetQuery(db,'select "UF","V1028","V1022","VD4020" from pnadc.pnadt202301')
 ```
 
@@ -882,7 +891,7 @@ pnadc[pnadc$UF==53,3]
 pnadc[pnadc[,1]==53,]$V1022
 ```
 
-Dentro da tabela, para indicar a linha a ser selecionada, informamos que queremos apenas as linhas em que a coluna `UF` é exatamente igual a 53. Se este fosse um campo caractere, deveríamos colocar a condição do filtro entre aspas (duplas ou simples).
+Dentro da tabela, para indicar a linha a ser selecionada, informamos que queremos apenas as linhas em que a coluna `UF` é exatamente igual a 53. Se este fosse um campo caractere, deveríamos colocar a condição do filtro entre aspas (duplas ou simples, no R é indiferente).
 
 Vamos refazer todos esses passos, agora de uma maneira muito mais simples e rápida, com o pacote `dplyr`, utilizando os pipes.
 
@@ -895,19 +904,20 @@ pnadc %>%
   dplyr::filter(UF=="53") %>%
   # Selecionar apenas as colunas UF eV1022
   dplyr::select(UF,V1022) %>% 
+  # Olhar apenas as primeiras linhas
   head()
 ```
 
 Com as funções `filter` e `select`, conseguimos filtrar e selecionar colunas facilmente, de uma maneira rápida e elegante.
 
-Perceba que foi necessário o conhecimento prévio de que o valor 53 estava presente na coluna `UF`. O pacote `stringr` conta com uma função para identificar certos argumentos no filtro, baseado em caracteres. Vejamos a função `str_detect()`.
+Perceba que foi necessário o conhecimento prévio de que o valor *53* estava presente na coluna `UF`. O pacote `stringr` conta com uma função para identificar certos argumentos no filtro, baseado em caracteres. Vejamos a função `str_detect()`.
 
 ```{r}
-# Consultar as tabelas disponíveis
+# Consultar as linhas disponíveis
 pnadc %>%
   # Filtrar apenas linhas do esquema PDAD
   dplyr::filter(stringr::str_detect(UF, pattern =  "5")) %>%
-  # Selecionar apenas a coluna com as tabelas
+  # Selecionar apenas a coluna UF
   dplyr::pull(UF) %>% 
   # tabular os dados
   table()
@@ -915,7 +925,7 @@ pnadc %>%
 
 Assim, podemos detectar facilmente um tipo de argumento quando não temos certeza do valor exato ou quando as possibilidades de categorias são muito amplas.
 
-Muitas vezes precisamos alterar o nome de uma coluna, seja para tornar seu entendimento mais fácil, seja por questão de conveniência seja por necessidade. Podemos fazer isso de duas maneiras: com a função `colnames()`, do pacote `base`, ou com a função `rename()`, do pacote `dplyr`.
+Muitas vezes precisamos alterar o nome de uma coluna, seja para tornar seu entendimento mais fácil, seja por questão de conveniência, seja por necessidade. Podemos fazer isso de duas maneiras: com a função `colnames()`, do pacote `base`, ou com a função `rename()`, do pacote `dplyr`.
 
 ```{r}
 # Alterar o nome da coluna "V1022" para Peso
@@ -928,41 +938,36 @@ pnadc %>%
   # Alterar os nomes das colunas
   dplyr::rename(Area=V1022,
                 V1028=Peso) %>% 
+  # Verificar resultado com as primeiras linhas
   head()
 
+# Retornar a variável de peso para o nome original
 pnadc <- pnadc %>%
-  # Alterar os nomes das colunas
-  dplyr::rename(Area=V1022,
-                V1028=Peso) 
+  # Alterar o nome da coluna
+  dplyr::rename(V1028=Peso) 
 
 ```
 
 
-## Continução
-
-Novamente, Vamos verificar quantas pessoas foram entrevistadas em cada UF.
-
-```{r}
-# Tabular a amostra por RA
-table(pnadc$UF)
-```
+## Outras manipulações de dados
 
 Note que os dados são apresentados com suas codificações. Precisaremos do dicionário de variáveis para entendermos a correspondências entre os códigos e as UFs.
 
-Para termos o dicionário de dados da base de moradores prontamente acessível dentro do R, vamos carregado utilizando a função `readxl::read_excel()`. Vamos baixar o dicionário e carregá-lo.
+Para termos o dicionário de dados da base de moradores prontamente acessível dentro do R, vamos carregá-lo utilizando a função `readxl::read_excel()`.
 
 ```{r}
 # Definir url
 url <- "https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
 
-# # Baixar arquivo
-# download.file(url,
-#               destfile = "./dados/dic.zip",
-#               mode = "wb")
+# Baixar arquivo
+download.file(url,
+              destfile = "./dados/dic.zip",
+              mode = "wb")
 
 # Extrair informações
 unzip("./dados/dic.zip",
       exdir = "./dados")
+
 # Listar os arquivos do diretório dados
 list.files("dados")
 
@@ -1024,9 +1029,11 @@ UF <- pnadc %>%
 table(UF$UF)
 ```
 
+Atente-se que o nome *UF* está sendo utilizado para designar um objeto e uma coluna dentro de um `data.frame`. Não há problema nenhum nisso, basta apenas se atentar para a diferença do que se está utilizando ao realizar sua programação. 
+
 A função fator possui três argumentos principais: o vetor a ser "fatorizado", os níveis existentes, i.e., o conjunto de valores únicos existente no vetor, e os rótulos que cada um dos níveis deve receber.
 
-Poderíamos ter feito isso utilizando diretamente o dicionário de variáveis, ajustando as informações pelo R.
+Poderíamos ter feito isso utilizando diretamente o dicionário de variáveis, ajustando as informações correspondentes.
 
 ```{r}
 # Recodificar os nomes
@@ -1055,7 +1062,7 @@ UF %>%
   coord_flip()
 ``` 
 
-Agora vamos organizar essas informações de uma outra maneira, resumindo o total da amostra por UF, refazendo o gráfico, para colocá-lo em ordem decrescente de localidade amostrada. Para isso, vamos utilizar o pacote `forcats`.
+Agora vamos organizar essas informações de uma outra maneira, resumindo o total da amostra por UF, refazendo o gráfico, para colocá-lo em ordem decrescente do n amostrada. Para isso, vamos utilizar o pacote `forcats`.
 
 ```{r}
 # Contar quantas pessoas foram amostradas em cada UF
@@ -1073,7 +1080,7 @@ UF %>%
        x="UF")
 ```
 
-Agora, a apresentação da informação ficou um pouco mais clara. Com o pacote `ggplot`, é possível alterar praticamente todos os aspectos de um gráfico. Existem alguns pacotes que carregam temas pré-configurados para serem utilizados com o `ggplot`. Vamos testar o pacote `ggthemes`. Basta rodar a função e adiiconar um tema ao final da função. Vamos também mudar a cor das barras com o argumento "fill" dentro da função `geom_bar()`. Você pode informar cores com seus respectivos nomes (em inglês) ou com códigos hexadecimais das cores (por exemplo "#12660f"). 
+Agora, a apresentação da informação ficou um pouco mais clara. Com o pacote `ggplot`, é possível alterar praticamente todos os aspectos de um gráfico. Existem alguns pacotes que carregam temas pré-configurados para serem utilizados com o `ggplot`. Vamos testar o pacote `ggthemes`. Basta rodar a função e adiciconar um tema ao final da função. Vamos também mudar a cor das barras com o argumento **"fill"** dentro da função `geom_bar()`. Você pode informar cores com seus respectivos nomes (em inglês) ou com códigos hexadecimais das cores (por exemplo "#12660f"). 
 
 ```{r}
 library(ggthemes)
@@ -1091,6 +1098,7 @@ UF %>%
   # Rotular os eixos
   labs(y="Amostra",
        x="UF") + 
+  # Adicionar o tema
   theme_minimal()
 ```
 
@@ -1157,12 +1165,12 @@ Vez ou outra nos deparamos com bases de dados que contêm variáveis do tipo dat
 Vamos verificar como estão preenchidas as primeiras linhas dessas colunas, com auxílio da função `head()`.
 
 ```{r}
-# Verificar as primeiras informações da coluna endtime
+# Verificar as primeiras informações da coluna 
 head(EstoqueTesouroDireto$`Vencimento do Titulo`)
 head(EstoqueTesouroDireto$`Mes Estoque`)
 ```
 
-Repare a primeira data está no formato "DD/MM/YYYY", enquanto a segunda está no formato "MM/YYYY".
+Repare que a primeira data está no formato "DD/MM/YYYY", enquanto a segunda está no formato "MM/YYYY".
 
 Vamos analisar agora qual a classe dessas colunas.
 
@@ -1202,7 +1210,7 @@ Agora que geramos a tabela com as informações filtradas, vamos salvar os resul
 
 Assim como as colunas possuem nomes, as linhas também podem ser nomeadas no R. Quando não damos um nome específico para as linhas, elas são, por padrão, nomeadas com números inteiros sequenciais, de 1 até o número de linhas da tabela. Consulte essa informação com a função `row.names()`.
 
-Como não queremos que essas informações apareçam na nossa tabela, utilizamos o argumento `row.names = F` no momento de escrevermos a tabela. Além disso, o arquivo será gerado, por padrão, delimitado por espaços. Vamos alterar o delimitador para ponto e vírgula `;`. Poderíamos escolher qualquer outro delimitador desejado. Por fim, caso necessário, você também pode informar o encoding desejado para salvar o arquivo, com o parâmtero `fileEncoding`. Se o seu objeto tiver algum valor ausente, você pode alterar o formato que ele será gravado com o parâmetro `na`. Por exemplo, para que os valores ausentes sejam gravados sem informação, utilize `na=""`. Caso você queira que as colunas com string sejam gravadas entre aspas, utilize o parâmetro `quote=TRUE`.
+Como não queremos que essas informações apareçam na nossa tabela, utilizamos o argumento `row.names = F` no momento de escrevermos a tabela. Além disso, o arquivo será gerado, por padrão, delimitado por espaços. Vamos alterar o delimitador para ponto e vírgula `;`. Poderíamos escolher qualquer outro delimitador desejado. Por fim, caso necessário, você também pode informar o **encoding** desejado para salvar o arquivo, com o parâmtero `fileEncoding`. Se o seu objeto tiver algum valor ausente, você pode alterar o formato que ele será gravado com o parâmetro `na`. Por exemplo, para que os valores ausentes sejam gravados sem informação, utilize `na=""`. Caso você queira que as colunas com string sejam gravadas entre aspas, utilize o parâmetro `quote=TRUE`.
 
 ```{r }
 write.table(datas_tesouro_ipca,
@@ -1278,6 +1286,7 @@ Assim, percebemos que, até 2013, houve aumento constante do valor do estoque, a
 Com o R, é possível fazermos mapas com relativa facilidade. Para tanto, precisaremos de informações geográficas dos mapas que queremos desenhar. Vamos fazer conexão com o banco de dados a e pegar as informações necessárias.
 
 ```{r}
+# Carregar pacotes
 library(ggrepel)
 library(sf)
 
@@ -1287,7 +1296,8 @@ db <- DBI::dbConnect(odbc::odbc(),
                      "comeq", 
                      user=Sys.getenv("matricula"),
                      password = Sys.getenv("senha"),
-                     maxvarcharsize=0)
+                     maxvarcharsize=0 # Parâmetro necessário para não retornar erro na consulta
+                     )
 
 # Puxar as informações de geometria
 UF <- sf::st_read(db, query="SELECT * FROM ibge.geo_uf",
@@ -1300,9 +1310,8 @@ pop <- pnadc %>%
   dplyr::group_by(UF) %>%
   # Somar os fatores
   dplyr::summarise(n=sum(V1028)) %>% 
+  # Ajustar tipo da coluna para o join
   dplyr::mutate(UF=as.character(UF))
-
-
 
 ```
 
@@ -1324,9 +1333,9 @@ mapa <- UF %>%
 
 Consulte o número de linhas e colunas da base criada. Repare que o número de linhas permaneceu o mesmo da base posicionada à esquerda, i.e., base territorial "UF". Como não havia nenhuma repetição nessa base, o resultado já era esperado. Experimente rodar o código novamente, agora substituindo a função `left_join` por `right_join` e perceba que o resultado é exatamente o mesmo. Esse é um cuidado que se deve ter quando o desejo é ligar duas bases. Caso as chaves de ligação tivessem múltiplos casos, a função iria realizar as combinações pertinentes, o que, geralmente, causa um grande aumento no tamanho da base. Dependendo da situação, tal operação pode travar sua sessão no RStudio server (além de travar o servidor como um todo) ou, em um banco de dados, igualmente travá-lo.
 
-Caso as duas bases tivessem colunas de mesmo nome, não seria necessário informar o argumento `by`. A função identifica todas as colunas de nomes iguais e tenta fazer a junção por todas essas colunas.  Se houvesse mais de uma condição, basta adicioná-las à direita, separando-as por vírgulas (e.g. `by=c("UF"="CD_UF","MUN"="CD_MUN")`).
+Caso as duas bases tivessem colunas de mesmo nome, não seria necessário informar o argumento `by`. A função identifica todas as colunas de nomes iguais e tenta fazer a junção por todas essas colunas.  Se houvesse mais de uma condição, bastaria adicioná-las à direita, separando-as por vírgulas (e.g. `by=c("UF"="CD_UF","MUN"="CD_MUN")`).
 
-*Atenção*: para que o join seja realizado, o tipo da variável deve ser o mesmo. Por exemplo, se a chave de identificação for do tipo `integer` em uma base e do tipo `numeric` na outra, o join não será realizado. O mesmo vale para chaves do tipo `character` e `integer` ou `numeric`. 
+*Atenção*: para que o join seja realizado, o tipo da variável deve ser o mesmo. Por exemplo, se a chave de identificação for do tipo `integer` em uma base e do tipo `numeric` na outra, o **join** não será realizado. O mesmo vale para chaves do tipo `character` e `integer` ou `numeric`. 
 
 Vamos, agora, finalizar a construção do nosso mapa.
 
@@ -1369,15 +1378,14 @@ ggsave(map,filename = "figuras/mapa_pop.png",
 
 <img src="figuras/mapa_pop.png" style="width: 600px;display: block;margin-left: auto;margin-right: auto "/>
 
-Para criar mapas que não estão no banco, utilize os passos abaixo.
+Caso você queira criar um mapa com um shape que não está disponível no banco de dados, utilize os passos abaixo. No exemplo abaixo, estamos baixando o mesmo shape diretamente do site do IBGE.
 
 
 ```{r, eval=FALSE}
+# Carregar pacotes
 library(ggrepel)
 library(sf)
 
-
-# tf<- "https://www.geoportal.seduh.df.gov.br/static/shapes_download/Regi%C3%B5es%20Administrativas.zip"
 
 # Link para o arquivo shape
 tf <- "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_UF_2022.zip"
@@ -1386,7 +1394,7 @@ tf <- "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/
 td <- "dados/ufs.zip"
 
 # Fazer o download do arquivo
-#download.file(tf, td, mode="wb")
+download.file(tf, td, mode="wb")
 
 # Descompactar o arquivo
 unzip(td,exdir="dados/ufs")
@@ -1395,12 +1403,13 @@ unzip(td,exdir="dados/ufs")
 # Carregar o arquivo .shp
 mapa <- sf::st_read("dados/ufs") 
 
-# Calcular o total de moradores por RA
+# Calcular o total de moradores por UF
 mor <- pnadc %>%
   # Agrupar por RA
   dplyr::group_by(UF) %>%
   # Somar os fatores
   dplyr::summarise(n=sum(V1028)) %>% 
+  # Ajustar tipo da coluna para o join
   dplyr::mutate(UF=as.character(UF))
 
 
@@ -1515,7 +1524,7 @@ inflacao_long %>%
         axis.text.x = element_text(angle=90))
 ```
 
-Vamos deixar um arquivo separado para atualizar posteriormente os valores de rendimento da PNAC.
+Vamos deixar um arquivo separado para atualizar posteriormente os valores de rendimento da PNADC.
 
 ```{r}
 inflacao_br <- inflacao %>% 
@@ -1537,7 +1546,7 @@ inflacao_br <- inflacao %>%
 
 ## Baixar dados do IPEADATA diretamente no R
 
-Assim como podemos baixar informações do IBGE diretamente no R, temos um pacote, `ipeadatar`, para baixar informações do IPEA. Para tanto, precisamos, primeiramente, saber as informações que estão disponíveis para download. Vamos ver abaixo isso funciona.
+Assim como podemos baixar informações do IBGE diretamente no R, temos um pacote, o `ipeadatar`, para baixar informações do IPEA Data. Para tanto, precisamos, primeiramente, saber as informações que estão disponíveis para download. Vamos ver abaixo como isso funciona.
 
 ```{r}
 library(ipeadatar)
@@ -1551,22 +1560,19 @@ Com isso, verificamos um amplo conjunto de informações disponível para downlo
 
 ```{r}
 # Baixar informações da Taxa de câmbio - R$ / US$ - comercial - compra - média
-
 cambio <- ipeadata("BM_ERC")
-
 ```
 
 
 # Manipulação da PNADC com expansão dos resultados
 
-Conforme dito anteriormente, a PNADC é uma pesquisa amostral, desenhada para fornecer a caracterização socioeconômica e demográfica das UFs brasileiras, sendo ainda mais específicas para alguns recortes territorias (áreas rurais e urbanas, regiões metropolitanas, capitais, entre outras). 
+Conforme dito anteriormente, a PNADC é uma pesquisa amostral, desenhada para fornecer mensalmente a situação do mercado de trabalho brasileiro, além da caracterização socioeconômica e demográfica das UFs brasileiras em períodos determinados. Além disso, ela consegue fornecer informações ainda mais específicas para alguns recortes territorias (áreas rurais e urbanas, regiões metropolitanas, capitais, entre outras). Para mais informações sobre o plano amostral da PNADC, acesse [esse material](https://www.ibge.gov.br/arquivo/projetos/sipd/SIPD_amostra_mestra_2010_e_amostra_PNAD_cont.pdf).
 
 A imagem abaixo ilustra o conceito de amostragem aplicado à PNADC (imagem extraída do site  [mathcaptain.com](http://www.mathcaptain.com/statistics/stratified-sampling.html)).   
 
 <img src="figuras/stratified_sample.png" style="width: 400px;display: block;margin-left: auto;margin-right: auto "/>
 
 Sendo assim, as estimativas fornecidas pela pesquisa estão sujeitas a um erro amostral, o que torna necessária a consideração de seu desenho amostral para seu cálculo. É com essas informações que construímos intervalos de confiança para as estimativas. De maneira simples, queremos fornecer, com algum grau de confiança, qual o verdadeiro valor populacional dada a amostra coletada. A população considerada para a PNADC parte das estimativas populacionais do próprio IBGE, estando sujeita a revisões conforme novas informações se tormar disponíveis (como, por exemplo, com atualizações do Censo).
-
 
 Neste curso iremos aprender a declarar o plano amostral da PNADC no R, utilizando o pacote `survey`. Vamos utilizar também o pacote `srvyr`, que roda o pacote `survey` sob a lógica do pacote `dplyr`, para calcular as estimativas.
 
@@ -1578,34 +1584,39 @@ Vamos agora declarar o plano amostral da PNADC trimestral. Para isso, vamos prec
 + O Peso trimestral com correção de não entrevista com calibração pela projeção de população: `V1028`;
 + O Peso replicado do domicílio e das pessoas: `V1028001` a `V1028200`
 
-Com essas informações, precisamos de apenas um passo para declarar o plano amostral da PNADC
+Com essas informações, precisamos de apenas um passo para declarar o plano amostral da PNADC.
+
+*Obs.:* a partir de 2021, o IBGE introduziu uma mudança na expansão da PNADC, que vigorava até então. Passaram a ser consideradas estimativas populacionais por faixas etárias e sexo. Anteriormente, as estimativas populacionais não contavam com esse detalhamento. Para mais informações, acesse a [nota técnica 04/2021](https://biblioteca.ibge.gov.br/visualizacao/livros/liv101882.pdf) do IBGE e [este site](https://guilhermejacob.github.io/2021/12/pnadc-raking-bootstrap/) e [este site](https://rstudio-pubs-static.s3.amazonaws.com/1001134_fb92955cf4774bbbaaebadd61d7218bf.html#fn1) para sua aplicação do R.
 
 ```{r}
-
+# Carregar pacote
 library(srvyr)
 
+# Definir as variáveis para download
 vars <- c("UF","V1028","V1022","VD4020","V2009","V2005",
           paste0("V",1028001:1028200))
 
+# Carregar as informações
 pnadc <- DBI::dbGetQuery(db,paste0('select ',
                                    paste0('"',vars,'"',collapse = ","), 
                                    'from pnadc.pnadt202301'))
 
-pnad_design <- survey::svrepdesign(data=pnadc, 
-                                   weight=~V1028, 
-                                   type="bootstrap", 
-                                   repweights="V1028[0-9]+", 
-                                   mse=TRUE, 
+# Fazer o design 
+pnad_design <- survey::svrepdesign(data=pnadc, # Objeto com os dados
+                                   weight=~V1028, # Peso
+                                   type="bootstrap", # Tipo de estimativa
+                                   repweights="V1028[0-9]+",  # Pesos replicados
+                                   mse=TRUE, # variância baseada na soma dos quadrados ao redor da estimativa pontual
                                    replicates=length(sprintf("V1028%03d",
-                                                             seq(1:200))), 
-                                   df=length(sprintf("V1028%03d", 
+                                                             seq(1:200))), # n replicações
+                                   df=length(sprintf("V1028%03d", # graus de liberdade
                                                      seq(1:200))))
 
-pnad_design <- as_survey(pnad_design)
+# Deixar como tibble (para utilizar o pacote srvyr)
+pnad_design <-srvyr::as_survey(pnad_design)
 ```
 
-
-Pronto! Com o objeto `pnad_design` podemos fazer estimativas para a população, partindo dos dados amostrais. Vamos testar estimando o total da população brasileira. O nosso objeto base agora será o `pnad_design`, com o qual utilizaremos o pacote `srvyr`. Com a parâmetro `vartype='ci'`, obtemos as estimativas dos intervalos de confiança. 
+Pronto! Com o objeto `pnad_design` podemos fazer estimativas para a população, partindo dos dados amostrais. Vamos testar estimando o total da população brasileira. O nosso objeto base agora será o `pnad_design`, com o qual utilizaremos o pacote `srvyr`. Com a parâmetro `vartype='ci'`, obtemos as estimativas dos intervalos de confiança. Podemos, também, utilizar o parâmetro "cv" dentro do `vartype` para calcular o coeficiente de variação.
 
 ```{r}
 # População DF com mais de 18 anos
@@ -1615,7 +1626,7 @@ pop18 <- pnad_design %>%
   # Criar uma variável auxiliar para contagem
   srvyr::mutate(count=1) %>%
   # Calcular o total da população, com seu intervalo de confiança
-  srvyr::summarise(n=survey_total(count, vartype = "ci"))
+  srvyr::summarise(n=survey_total(count, vartype = c("ci","cv")))
 ```
 
 Verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas. 
@@ -1631,14 +1642,16 @@ Repare que, para calcular essas estimativas, foi necessário pegar do banco 201 
 + Os domínios de projeção por sexo e idade: `posest_sxi`;
 + A projeção da população por sexo e idade: `V1033`.
 
-Com essas informações iremos informar ao pacote `survey` o desenho inicial da pesquisa e a pos-estratificação, que seria as projeções populacionais para os domínios definidos.
+Com essas informações, iremos informar ao pacote `survey` o desenho inicial da pesquisa e a pós-estratificação, que seria as projeções populacionais para os domínios informados anteriormente.
 
 ```{r}
 
+# Definir variáveis
 vars <- c("UF","V1028","V1022","VD4020","V2009","V2005","V2007","V2001",
           "UPA","V1008","V1014","Estrato","V1027","posest",
           "V1029","posest_sxi","V1033")
 
+# Puxar os dados
 pnadc <- DBI::dbGetQuery(db,paste0('select ',
                                    paste0('"',vars,'"',collapse = ","), 
                                    'from pnadc.pnadt202301'))
@@ -1649,45 +1662,57 @@ pnadc <- pnadc %>%
   dplyr::mutate_at(vars(UPA,Estrato,posest,posest_sxi),
                    list(~as.character(.)))
 
-desenho_inicial <- survey::svydesign(ids=~UPA+ID_DOMICILIO,
-                                     strata=~Estrato,
-                                     data=pnadc,
-                                     weights=~V1027,
-                                     nest=TRUE)
+# Fazer o desenho inicial
+desenho_inicial <- survey::svydesign(ids=~UPA+ID_DOMICILIO, # Ids
+                                     strata=~Estrato, # Estratos do desenho da amostra da PNADC
+                                     data=pnadc,# Base de dados
+                                     weights=~V1027, # Pesos
+                                     nest=TRUE # Ajuster dos IDs dentro dos estratos
+                                     )
 
 # Totais populacionais por pós-estratos geográficos
 popc.types <- pnadc %>%
+  # Agrupar pelos estratos
   dplyr::group_by(posest) %>%
+  # Sumarizar
   dplyr::summarise(Freq=first(V1029)) %>%
+  # Desagrupar
   dplyr::ungroup() %>%
+  # Ordenar os dados
   dplyr::arrange(posest)
  
 # Totais populacionais por pós-estratos de sexo e idade
 popi.types <- pnadc %>%
+  # Agrupar os dados
   dplyr::group_by(posest_sxi) %>%
+  # Sumarizar
   dplyr::summarise(Freq=first(V1033)) %>%
+  # Desagrupar
   dplyr::ungroup() %>%
+  # Ordenar os dados
   dplyr::arrange(posest_sxi)
  
-# # Informações populacionais
+# Criar objeto com as informações populacionais para o raking
 pop.rake.calib <- c(sum(popc.types$Freq),
                     popc.types$Freq[-1],
                     popi.types$Freq[-1])
 
 # Declarar o plano amostral
-pnad_design <- survey::calibrate(design=desenho_inicial,
-                                 formula=~posest+posest_sxi,
-                                 pop=pop.rake.calib,
-                                 calfun="raking",
-                                 aggregate.stage=2,
-                                 bounds=c(0.2,5),
-                                 multicore=TRUE)
+pnad_design <- survey::calibrate(design=desenho_inicial, # Desenho inicial
+                                 formula=~posest+posest_sxi, # Definição da cobinação para o raking
+                                 pop=pop.rake.calib, # informações populacionais
+                                 calfun="raking", # Método
+                                 aggregate.stage=2, # Estágios
+                                 bounds=c(0.2,5), # limites
+                                 multicore=TRUE, # Usar multiprocessamento
+                                 sparse=TRUE # Para calcular mais rápido (matriz esparsa)
+                                 )
 
 # Ajustar para tratamento de estratos com apenas uma UPA (adjust=centered)
 options(survey.lonely.psu = "adjust")
 
 # Ajustar objeto de amostra, para uso com o pacote srvyr (como tibble)
-pnad_design <- as_survey(pnad_design)
+pnad_design <- srvyr::as_survey(pnad_design)
 
 ```
 
@@ -1706,13 +1731,12 @@ pop18 <- pnad_design %>%
 
 Agora, verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas, exatamente o mesmo calculado anteriomente.
 
-Assim, caso existam limitações computacionais, esse metodo pode ser utilizado, ressalvando-se as diferenças existentes nas estimativas das variâncias.
+Assim, caso existam limitações computacionais, esse método pode ser utilizado, ressalvando-se as diferenças existentes nas estimativas das variâncias.
 
 Caso o desejo fosse estimar esse mesmo total por UF, isso poderia ser feito com a função `group_by()`. Vamos aproveitar e calcular o percentual de cada grupo no total.
 
 
 ```{r}
-
 pnad_design %>%
   # Filtrar somente a população com 18 anos ou mais de idade, retirando os códigos de não informação
   srvyr::filter(V2009>=18) %>%
@@ -1731,17 +1755,17 @@ Vamos calcular a rendimento do trabalho nominal e real para o Brasil, sem consid
 
 ```{r}
 pnad_design %>%
-  # Calcular a renda domiciliar real média do DF
+  # Calcular o rendimento médio do trabalho
   srvyr::summarise(renda_real=survey_mean(VD4020*inflacao_br,na.rm=T,vartype="ci"),
                    renda=survey_mean(VD4020,na.rm=T,vartype="ci"))
 
-# Renda sem expansão
+# Rendimento sem expansão
 mean(pnadc$VD4020,na.rm=T)
 ```
 
 ```{r, include=F}
 rnd<-pnad_design %>%
-  # Calcular a renda domiciliar real média do DF
+  # Calcular o rendimento médio do trabalho
   srvyr::summarise(renda_real=survey_mean(VD4020*inflacao_br,na.rm=T,vartype="ci"),
                    renda=survey_mean(VD4020,na.rm=T,vartype="ci")) %>% 
   round()
@@ -1757,7 +1781,7 @@ Vamos agora elencar algumas variáveis para construirmos um pequeno relatório. 
 As informações serão criadas com a função `mutate()`, as faixas de idade e de rendimento serão criadas com auxílio da função `cut()`. Ao final, utilizaremos a função `mutate_if()` para transformar as variáveis do tipo *character* em fator e, por fim, utilizaremos a função `select()` para selecionar as variáveis desejadas. Para criar as faixas de rendimento, consideraremos o número de salários mínimos, vigente em 2023.
 
 ```{r}
-# Criar um objeto com o salário mínimo em 2021
+# Criar um objeto com o salário mínimo em 2023
 sm <- 1320
 
 # Criar um objeto com as variáveis de interesse
@@ -1927,7 +1951,7 @@ library(scales)
 salario2 <- vars_relatorio %>%
   # Filtrar somente para casos válidos
   srvyr::filter(is.na(faixas_salario)==FALSE) %>% 
-  # Agrupar por RA e faixas de salário
+  # Agrupar por UF e faixas de salário
   srvyr::group_by(UF,faixas_salario) %>%
   # Calcular as proporções por faixa de salário
   srvyr::summarise(n=survey_mean(na.rm=T,vartype = "ci")) %>% 
@@ -1955,7 +1979,7 @@ salario2 %>%
 ```
 
 
-Para o último gráfico, como estamos realizando uma estatística para o domicílio, precisamos filtrar para selecionarmos apenas a informação do chefe (cujo peso é utilizado para expandir os resultados domiciliares). Fazemos isso com auxílio da função `filter()`. Como maneira de facilitar a leitura dos dados, adicionamos os valores exatos de cada coluna com a função `geom_text()`.
+Para o último gráfico, como estamos realizando uma estatística para o domicílio, precisamos filtrar para selecionarmos apenas a informação do responsável (cujo peso é utilizado para expandir os resultados domiciliares). Fazemos isso com auxílio da função `filter()`. Como maneira de facilitar a leitura dos dados, adicionamos os valores exatos de cada coluna com a função `geom_text()`.
 
 ```{r}
 # Construir o objeto com o número de moradores
@@ -2002,7 +2026,7 @@ Vamos ver como fazer um gráfico de setores, com as mesmas informações anterio
 # Carregar o pacote ggrepel
 library(ggrepel)
 
-# Construir o objeto com as informações de esgotamento sanitário
+# Construir o objeto com as informações do número de moradores
 nmor2 <- pnad_design %>%
   srvyr::filter(V2005==1) %>% 
   srvyr::mutate(# Criar variável para o número de pessoas no domicílio
