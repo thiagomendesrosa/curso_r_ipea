@@ -47,7 +47,7 @@ setwd("~/curso_r_ipea")
 
 Este minicurso de R será focado no `tidyverse` (universo "arrumado"), que conta com um conjunto de pacotes que auxiliam os pesquisadores a manipularem suas bases de dados, preparando-as para que análises possam ser realizadas. Ajustar a base de dados, geralmente, é a etapa que mais consome tempo em uma pesquisa. Portanto, ter uma ferramenta que torne essa tarefa mais eficiente é fundamental.
 
-Informações mais aprofundadas sobre o `tidyverse` estão disponíveis livro [R for data science](http://r4ds.had.co.nz/). 
+Informações mais aprofundadas sobre o `tidyverse` estão disponíveis livro [R for data science](https://r4ds.hadley.nz/). 
 
 Esse curso foi baseado nos cursos [R pragmático](https://curso-r.github.io/ragmatic-book/) e [Curso de R](http://material.curso-r.com/rbase/), que podem ser consultados sempre que necessário. O livro [R para cientistas sociais](http://www.uesc.br/editora/livrosdigitais_20140513/r_cientistas.pdf) é uma outra boa fonte de informações. Para análise de dados com estatística aplicada, o livro [Estatística Básica - Bussab e Morettin (2017)](https://rpubs.com/EstatBasica/Introd) conta com um site com os exemplos apresentados no livro. O site do [institute for digital research and education, da UCLA](https://stats.idre.ucla.edu/other/dae/) conta com valiosos tutoriais que podem ser consultados sempre que necessário para a aplicação de técnicas estatísticas no R. Para análise de pesquisas amostrais complexas, o site [do Anthony Joseph Damico](http://asdfree.com/) é uma formidável fonte de consulta (que contempla as pesquisas do IBGE).
 
@@ -89,7 +89,7 @@ Como surgiu o R e quem o utiliza hoje?
 
 - Um dos focos do R é análise de dados e a interatividade. Isso faz com que o R seja uma linguagem intuitiva e flexível;
 
-- Código **aberto**: **sem pirataria!**
+- Código **aberto**. Sem custos com licenças;
 
 - Constantemente atualizado;
 
@@ -97,7 +97,7 @@ Como surgiu o R e quem o utiliza hoje?
 
 - O R possui a possibilidade de adotar diversos pacotes. Estes pacotes são coleções de funções e/ou bases de dados desenvolvidos pela comunidade que utiliza a ferramenta. Os pacotes ficam disponíveis no [CRAN](https://cran.r-project.org/) -- *Comprehensive R Archive Network* -- que nada mais é do que uma coleção de sites da linguagem R e seus documentos relacionados;
 
-- Versatilidade para integração com outras linguagens e ferramentas. Já é possível rodar python diretamente no RStudio (o RStudio agora é Posit; acesse [https://posit.co/](https://posit.co/) para mais informações);
+- Versatilidade para integração com outras linguagens e ferramentas.É possível rodar python diretamente no RStudio (o RStudio agora é Posit; acesse [https://posit.co/](https://posit.co/) para mais informações);
 
 - As versões mais recentes do R podem ser baixadas [neste site](https://www.r-project.org/).
 
@@ -105,7 +105,7 @@ Como surgiu o R e quem o utiliza hoje?
 
 - O R é, em muitos casos, preterido por programadores no desenvolvimento de aplicações (por exemplo, sua linguagem não se aproxima tanto da linguagem utilizada por esses profissionais quanto o python);
 
-- Para alguns pacotes, a documentação pode não ser tão clara ou detalhada quanto a existente em outras ferramentas (como o Stata, por exemplo);
+- Para alguns pacotes, a documentação pode não ser tão clara ou detalhada quanto à existente em outras ferramentas (como o Stata, por exemplo);
 
 - Nem sempre é fácil interpretar as mensagens de erro. Nesses casos, o código aberto permite rastrear todos os passos executados, auxiliando as depurações. Todavia, isso nem sempre é uma tarefa trivial;
 
@@ -115,36 +115,37 @@ Como surgiu o R e quem o utiliza hoje?
 
 - A instalação de alguns pacotes e ferramentas pode ser complicada, exigindo algum conhecimento mais avançado dos usuários conforme a plataforma utilizada;
 
-- Devido aos itens anteriores, a reprodutibilidade de alguns scripts pode ficar comprometida. Guardar informações da sessão em que o código foi executado pode mitigar essa situação (versão do R, da platarforma e dos pacotes utilizado). O gerenciamento centralizado do RStudio Server, por exemplo, contribui para minimizar esse tipo de ocorrência.
+- Devido aos itens anteriores, a reprodutibilidade de alguns scripts pode ficar comprometida. Guardar informações da sessão em que o código foi executado pode mitigar essa situação (versão do R, da platarforma e dos pacotes utilizado). Um gerenciamento centralizado, como com a utilisação do RStudio Server, por exemplo, contribui para minimizar esse tipo de ocorrência.
 
 
 ## RStudio
 
-O RStudio é um ambiente integrado de desenvolvimento (*integrated development environment* -- IDE) para a linguagem R e outras (como o Python). Ele ajuda a organizar os trabalhos desenvolvidos, dividindo os conteúdos em janelas. Ele, por exemplo, tem recursos que facilitam a escrita dos códigos (com atalhos de teclado e o recurso de autocompletar). Além disso, possibilita que algumas funções sejam utilizadas via *point-and-click*. Acesse  [essa página](https://csgillespie.github.io/efficientR/set-up.html#rstudio) para maiores informações (em inglês).
+O RStudio é um ambiente integrado de desenvolvimento (*integrated development environment* -- IDE) para a linguagem R e outras (como o Python). Ele ajuda a organizar os trabalhos desenvolvidos, dividindo os conteúdos em janelas. Ele, por exemplo, tem recursos que facilitam a escrita dos códigos (com atalhos de teclado e o recurso de autocompletar). Além disso, possibilita que algumas funções sejam utilizadas via *point-and-click*. Acesse  [essa página](https://csgillespie.github.io/efficientR/set-up.html#rstudio) para maiores informações.
 
-Para baixar o RStudio, acesse [este site](https://www.rstudio.com/products/rstudio/download/).
+Para baixar o RStudio, acesse [este site](https://posit.co/download/rstudio-desktop/).
 
 Um recurso muito importante do RStudio, amplamente utilizado nas instituições, é a possibilidade de criar projetos com controle de versão, por meio, por exemplo, do [Github](https://github.com/) ou [Gitlab](https://gitlab.com/). Todos os pacotes do R, por exemplo, estão armazenados publicamente no Github.
 
-## RStudio Server
+<!-- ## RStudio Server -->
 
-A COMEQ conta com o RStudio server, o que significa que você pode acessar e trabalhar de qualquer máquina conectada à rede do IPEA diretamente do navegador. Clique [aqui](http://10.233.35.55:8787/) para acessar o servidor.
+<!-- A COMEQ conta com o RStudio server, o que significa que você pode acessar e trabalhar de qualquer máquina conectada à rede do IPEA diretamente do navegador. Clique [aqui](http://10.1.1.37:8787//) para acessar o servidor. -->
 
-Uma vantagem de utilizar o Rserver é sua maior capacidade de processamento, quando comparado com as máquinas locais, contando atualmente com XXGB de memória RAM e um processador de XX núcleos.
+<!-- Uma vantagem de utilizar o Rserver é sua maior capacidade de processamento, quando comparado com as máquinas locais, contando atualmente com XXGB de memória RAM e um processador de XX núcleos. -->
 
-Além disso, os pacotes instalados para a realização de um projeto ficam disponíveis para os demais usuários do instituto, sendo periodicamente atualizados pelo administrador do servidor. Isso facilita a reprodutibilidade dos códigos escritos por outros usuários, auxiliando também na continuidade de pesquisas e projetos. Sempre que precisar instalar um pacote, comunique o administrador do servidor [thiago.rosa@ipea.gov.br] para que ele também fique disponível para os demais usuários. Caso você necessite um pacote que demande alguma atualização do servidor, contate o administrador do servidor explicando os detalhes.
+<!-- Além disso, os pacotes instalados para a realização de um projeto ficam disponíveis para os demais usuários do instituto, sendo periodicamente atualizados pelo administrador do servidor. Isso facilita a reprodutibilidade dos códigos escritos por outros usuários, auxiliando também na continuidade de pesquisas e projetos. Sempre que precisar instalar um pacote, comunique o administrador do servidor [thiago.rosa@ipea.gov.br] para que ele também fique disponível para os demais usuários. Caso você necessite um pacote que demande alguma atualização do servidor, contate o administrador do servidor explicando os detalhes. -->
 
 ## Banco de dados da COMEQ
 
 Em 2023, a COMEQ lançou a iniciativa de organizar dados regionalizáveis em um banco de dados próprio, deixando-as prontas para uso e disponíveis a qualquer pesquisador do IPEA. Inicialmente, a principal fonte de informação advém das pesquisas do IBGE. Entretanto, a intenção é tornar disponível todas as bases que a COMEQ julgar conveniente para agilizar as atividades de seus pesquisadores. A vantagem de se utilizar um banco de dados centralizado é que todos os pesquisadores usam a mesma fonte de informação para a produção de relatórios, garantindo consistência aos produtos gerados.
 
-Além disso, as bases utilizadas em um trabalho ficam à disposição dos demais pesquisadores do insituto, evitando o tráfego de informações localmente, redundancias e otimizando os recursos tecnológicos do IPEA. Quanto mais usuários estiverem utilizando a mesma fonte de dados, mais fácil fica para validar as informações e proceder eventuais correções, beneficiando todos os usuários. 
+Além disso, as bases utilizadas em um trabalho ficam à disposição dos demais pesquisadores do instituto, evitando o tráfego de informações localmente, redundancias e otimizando os recursos tecnológicos do IPEA. Quanto mais usuários estiverem utilizando a mesma fonte de dados, mais fácil fica para validar as informações e proceder eventuais correções, beneficiando todos os usuários. 
 
 Atualmente, o banco conta com as seguintes informações:
 
 - PNADC trimestral
 - PNADC anual
 - Malhas territoriais do IBGE
+- Censo Demográfico
 - IDHs municipais
 - Índice firjan
 - Projeções populacionais
@@ -153,26 +154,28 @@ Atualmente, o banco conta com as seguintes informações:
 - Contas anuais estaduais
 - Pagamentos e beneficioários do Bolsa Família e do BPC
 - Aeródromos brasileiros
+- CAGED identificado
+- RAIS identificada
+- Dados metereológicos do INMET
+- Contas municipais (SICONFI)
 
-As informações armazenadas no banco de dados podem ser facilmente carregadas pelo R (ou na maioria dos demais pacotes estatístico, como STATA ou SAS), por conexão ODBC -- acrônimo para *Open Database Connectivity*. O RStudio server já está configurado para fazer esta conexão, enquanto as máquinas locais podem ser facilmente configuradas seguindo [esses passos](https://www.sqlshack.com/configure-odbc-drivers-for-postgresql/). As bases podem ser acessadas com os pacotes `RODBC` ou `DBI`, através de consultas SQL (*Structured Query Language*), que nada mais é que uma linguagem estruturada para realizar consultas em bancos de dados.
+As informações armazenadas no banco de dados podem ser facilmente carregadas pelo R (ou na maioria dos demais pacotes estatístico, como STATA ou SAS), por conexão ODBC -- acrônimo para *Open Database Connectivity*. Essas conexões podem ser configuradas uma única vez em máquinas locais seguindo [esses passos](https://www.sqlshack.com/configure-odbc-drivers-for-postgresql/). As bases podem ser acessadas com os pacotes `RODBC` ou `DBI`, através de consultas SQL (*Structured Query Language*), que nada mais é que uma linguagem estruturada para realizar consultas em bancos de dados. Além disso, é possível acessar o banco de dados com outras ferramentas específicas, como o [DBeaver](https://dbeaver.io/download/) ou o [PGadmin](https://www.pgadmin.org/).
 
 ## GitHub
 
 O **GitHub** é uma plataforma online de compartilhamento e armazenamento de códigos. Os projetos do GitHub são baseados no [git](https://git-scm.com/), uma ferramenta de versionamento de software.
 
-O IPEA possui um [gitlab](https://gitlab.ipea.gov.br/explore/projects) para gerenciar e versionar seus projetos, de modo a mantê-los organizados e atualizados, sem o risco de perder informações acidentalmente ou por alguma falha técnica. Outra vantagem é a característica colaborativa da plataforma, permitindo o acesso aos códigos de qualquer lugar, via internet, por outros pesquisadores. Se o repositório for público, qualquer pessoa pode contribuir com os projetos, proporcionando ganhos a todos os futuros usuários. Verifique com o suporte técnico como utilizar a ferramenta.
-
-
+O IPEA possui um [gitlab](https://gitlab.ipea.gov.br/explore/projects) para gerenciar e versionar seus projetos, de modo a mantê-los organizados e atualizados, sem o risco de perder informações acidentalmente ou por alguma falha técnica. Outra vantagem é a característica colaborativa da plataforma, permitindo o acesso aos códigos de qualquer lugar, via internet, por outros pesquisadores (o gitlab do ipea requer acesso à rede interna). Se o repositório for público, qualquer pessoa pode contribuir com os projetos, proporcionando ganhos a todos os futuros usuários. Verifique com o suporte técnico como utilizar a ferramenta.
 
 ## RMarkdown
 
-O **Markdown** é um sistema para tornar a escrita e a leitura de textos mais simples. Ele adiciona as formatações correspondentes à estrutura na qual você deseja apresentar seu texto. Tudo isso é feito de maneira simplificada, através de símbolos de teclado.
+O **Markdown** é um sistema para tornar a escrita e a leitura de textos mais simples. Ele adiciona as formatações correspondentes à estrutura na qual você deseja apresentar seu texto. Tudo isso é feito de maneira simplificada, através de símbolos.
 
 No R, o RMarkdown, é um tipo de documento especial que contém tanto textos, no formato markdown, quanto códigos, em R (ou outras linguagens, como SQL e python). Os códigos em R podem ser inseridos diretamente no texto, entre dois acentos graves e seguidos da letra `r`, ou separados em estruturas específicas (*chunks*). Os códigos são executados sempre que o documento é processado para algum formato específico, que pode ser HTML (como esse documento que você está lendo), em PDF (formato $\LaTeX$) ou mesmo microsoft Word. Apresentações de slides também podem ser facilmente realizadas com o Rmarkdown, nos formatos `HTML`, PDF ($\LaTeX$) ou microsoft Power Point.
 
-Suas principais vantagens são a **velocidade**, **reprodutibilidade** e **eficiência** na produção destes relatórios. 
+Suas principais vantagens são a **velocidade**, **reprodutibilidade**, a **organização** e **eficiência** na produção destes relatórios. 
 
-Para detalhes sobre como utilizar o RMarkdown, acesse [esse](http://r4ds.had.co.nz/r-markdown.html) e [esse](http://rmarkdown.rstudio.com/lesson-1.html) sites (em inglês).
+Para detalhes sobre como utilizar o RMarkdown, acesse [esse](http://r4ds.had.co.nz/r-markdown.html) e [esse](http://rmarkdown.rstudio.com/lesson-1.html) sites.
 
 # Preliminares
 
@@ -187,15 +190,17 @@ Se o seu sistema operacionar for Windows, baixe o [R base](https://cran.r-projec
 Por fim, baixe e instale o [RStudio](https://posit.co/download/rstudio-desktop/).
 
 
-## Estrutura do RStudio Server
+## Estrutura do RStudio
 
-O primeiro passo é efetuarmos o login no RStudio server da COMEQ Para isso, acesse o site do [servidor](http://10.233.35.55:8787/).
+<!-- O primeiro passo é efetuarmos o login no RStudio server da COMEQ Para isso, acesse o site do [servidor](http://10.1.1.37:8787/). -->
 
-<img src="figuras/login.PNG" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
+O primeiro passo é abrir o RStudio instalado em alguma máquina (localmente ou em algum servidor de alta performance no IPEA, por exemplo).
 
-Entre com suas credenciais (*u* seguido de sua *matrícula*) e faça o login.
+<!-- <img src="figuras/login.PNG" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/> -->
 
-O RStudio server estará dividido em quatro painéis (ou três, caso seja seu primeiro login): o superior à esquerda apresenta os scripts abertos para uso; o inferior à esquerda apresenta o console, local onde os comandos e seus resultados são apresentados. Nesse painel, há também uma aba para o terminal do Linux e uma aba *Background Jobs*, na qual você pode rodar scripts sem que sua sessão atual seja afetada; o superior direito apresenta o ambiente, com os objetos ativos na sessão. Há mais cinco abas, com o histórico dos comandos executados, as conexões, *build* (para desenvolvimentos), o Git (se você estiver no ambiente de projetos) e uma aba *Tutorial* com a qual você pode aprender algumas funcionalidade do R; por fim, o inferior direito apresenta o diretório de trabalho, com as pastas e arquivos. Há ainda mais quatro abas, que apresentam os *plots* gerados, os pacotes disponíveis na biblioteca, a janela de ajuda e a janela de visualização (utilizadas por alguns pacotes para mostrar conteúdos da web ou em html).
+<!-- Entre com suas credenciais (*u* seguido de sua *matrícula*) e faça o login. -->
+
+O RStudio está dividido em quatro painéis (ou três, caso seja seu primeiro acesso/sessão): o superior à esquerda apresenta os scripts abertos para uso; o inferior à esquerda apresenta o console, local onde os comandos e seus resultados são apresentados. Nesse painel, há também uma aba para o terminal (área de comando para Linux, Windows ou Mac) e uma aba *Background Jobs*, na qual você pode rodar scripts sem que sua sessão atual seja afetada; o superior direito apresenta o ambiente, com os objetos ativos na sessão. Há mais cinco abas, com o histórico dos comandos executados, as conexões, *build* (para projetos que interagem com pacotes R packages ou Quarto/R Markdown websites/books), o Git (se você estiver no ambiente de projetos) e uma aba *Tutorial* com a qual você pode aprender algumas funcionalidade do R; por fim, o inferior direito apresenta o diretório de trabalho, com as pastas e arquivos. Há ainda mais quatro abas, que apresentam os *plots* gerados, os pacotes disponíveis na biblioteca, a janela de ajuda, a janela de visualização (utilizadas por alguns pacotes para mostrar conteúdos da web ou em html) e a janela de apresentação, para trabalhos projetos de Quarto no formato *revealjs*.
 
 <img src="figuras/Rserver.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
@@ -203,40 +208,6 @@ Na parte superior, existe uma barra de tarefas, com a qual você pode criar novo
 
 Por todos os painéis existem atalhos úteis para executar diversas tarefas (abrir um novo script, criar um novo projeto, salvar o script atual, criar uma nova pasta etc.). Aproveite para conhecer essas opções.
 
-## Pacotes
-
-Uma das funções mais básicas é instalar e carregar um pacote no R. Por exemplo:
-
-```{r, warning=FALSE, message=FALSE}
-#install.packages("tidyverse") # Instalar o pacote "tidyverse"
-library(tidyverse) # Carregar o pacote "tidyverse"
-
-# Siga os passos abaixo para instalar os pacotes utilizados nesse curso
-# pacotes <- c("tidyverse","data.table","Hmisc","lubridate",
-#              "ggrepel","sf","sidrar","survey",
-#              "srvyr","scales","ggthemr","readxl",
-#              "kableExtra","psych","xtable")
-
-
-# if(length(setdiff(pacotes,installed.packages()))==0){}else{
-#   
-#   install.packages(setdiff(pacotes,installed.packages()))
-#   
-# }
-
-#devtools::install_github('cttobin/ggthemr')
-```
-
-Note que o caractere `#` é utilizado para escrever comentários na codificação. Documentar detalhadamente seu código é fundamental para que as pessoas que trabalham com você entendam o que foi realizado. Além disso, é fundamental para que uma tarefa que dependa desse código possa ser executada ou alterada por outro pesquisador. Lembre-se que tudo o que produzimos, no fim, é público e deve ser o mais acessível possível para qualquer pessoa! Para comentar uma série de linhas ao mesmo tempo, utilize o atalho `Ctrl`+`Shift`+`C` após selecioná-las.
-
-**Dica:** para alterar várias linhas de uma só vez, segure a tecla `Alt` e use o cursor para selecionar as linhas. Desse modo, você conseguirá editar mais rapidamente seus scripts que demandam repetição de termos. Para mais dicas, acesse [esse site](https://appsilon.com/rstudio-shortcuts-and-tips/), feito por Paweł Przytuła.
-
-Tão importante quanto utilizar um pacote é citar ele no seu trabalho. Para tanto, utilize a função `citation()`.
-
-```{r}
-citation("tidyverse")
-```
-  
 ## Operadores básicos
 
 Dentro do R, alguns operadores básicos são constantemente utilizados. Os mais comuns são:
@@ -282,7 +253,64 @@ Algumas teclas de atalho podem ser bastante úteis na hora de escrever os códig
 - **Alt+Shift+K**: janela com todos os atalhos disponíveis.
 - **Alt+seleção com mouse**: permite que você altere várias linhas de uma única vez.
 
-Agora vamos realizar algumas operações matemáticas básicas com o R. Digite diretamente no console (ou abra um script e escreva os códigos) e utilize o atalho de teclado para rodar o código (você pode também rodar o código com o botão "Run" na parte superior da janela de script).
+## Utilizar chamada de funções
+
+As funções no R são palavras específicas seguidas de parenteses `()`. Algumas delas estão sempre disponíveis no R (como as **base functions**), enquanto outras estão apenas quando os pacotes são carregados. Vamos ver as funções de soma `sum()` e de multiplicação `prod()`.
+
+Digite diretamente no console (ou abra um script e escreva os códigos) e utilize o atalho de teclado para rodar o código (você pode também rodar o código com o botão "Run" na parte superior da janela de script).
+
+```{r, warning=FALSE, message=FALSE}
+sum(1,2) # Adição
+prod(2,2) # Multiplicação
+```
+
+Algumas funções podem ser chamadas diretamente de seus pacotes, sem que seja necessário carregá-lo. Para isso, escreva o nome do pacote instalado, seguido do símbolo `::`.
+
+```{r, warning=FALSE, message=FALSE,results='hide'}
+psych::describe(c(1,2)) # Utilizando a função describe, do pacote "psych", sem carregá-lo
+```
+
+Apesar de ser necessário digitar mais caracteres para obter o resultado, chamar funções desta maneira apresenta duas vantagens. A primeira é que fica claro, em cada passo, qual pacote está sendo utilizado para executar determinada tarefa. Em segundo lugar, caso exista algum outro pacote com uma função de mesmo nome, não haverá o risco de utilizarmos a função errada para o problema que estamos tratando (evita-se ambiguidades).
+
+## Pacotes
+
+Uma das funções mais básicas é instalar e carregar um pacote no R. Por exemplo:
+
+```{r, warning=FALSE, message=FALSE}
+#install.packages("tidyverse") # Instalar o pacote "tidyverse"
+library(tidyverse) # Carregar o pacote "tidyverse"
+
+# Siga os passos abaixo para instalar os pacotes utilizados nesse curso
+# pacotes <- c("tidyverse","data.table","Hmisc","lubridate",
+#              "ggrepel","sf","sidrar","survey","DBI","RODBC",
+#               "sidrar","ipeadatar",
+#              "srvyr","scales","ggthemr","readxl",
+#              "kableExtra","psych","xtable")
+
+
+# if(length(setdiff(pacotes,installed.packages()))==0){}else{
+#   
+#   install.packages(setdiff(pacotes,installed.packages()))
+#   
+# }
+
+#devtools::install_github('cttobin/ggthemr')
+```
+
+Note que o caractere `#` é utilizado para escrever comentários na codificação. Documentar detalhadamente seu código é fundamental para que as pessoas que trabalham com você entendam o que foi realizado. Além disso, é fundamental para que uma tarefa que dependa desse código possa ser executada ou alterada por outro pesquisador. Lembre-se que tudo o que produzimos, no fim, é público e deve ser o mais acessível possível para qualquer pessoa! Para comentar uma série de linhas ao mesmo tempo, utilize o atalho `Ctrl`+`Shift`+`C` após selecioná-las.
+
+**Dica:** para alterar várias linhas de uma só vez, segure a tecla `Alt` e use o cursor para selecionar as linhas. Desse modo, você conseguirá editar mais rapidamente seus scripts que demandam repetição de termos. Para mais dicas, acesse [esse site](https://appsilon.com/rstudio-shortcuts-and-tips/), feito por Paweł Przytuła.
+
+Tão importante quanto utilizar um pacote é citar ele no seu trabalho. Para tanto, utilize a função `citation()`.
+
+```{r}
+citation("tidyverse")
+```
+  
+
+## Operações básicas
+
+Agora vamos realizar algumas operações matemáticas básicas com o R.
 
 ```{r warning=FALSE, message=FALSE}
 1 + 2 # Adição
@@ -326,26 +354,9 @@ c(2+2,1+4)==5 # 2 + 2 é igual a 5? 1 + 4 é igual a 5?
 
 Agora, o R testa separadamente os dois casos.
 
-## Utilizar chamada de funções
-
-As funções no R são palavras específicas seguidas de parenteses `()`. Algumas delas estão sempre disponíveis no R (como as **base functions**), enquanto outras estão apenas quando os pacotes são carregados. Vamos ver as funções de soma `sum()` e de multiplicação `prod()`.
-
-```{r, warning=FALSE, message=FALSE}
-sum(1,2) # Adição
-prod(2,2) # Multiplicação
-```
-
-Algumas funções podem ser chamadas diretamente de seus pacotes, sem que seja necessário carregá-lo. Para isso, escreva o nome do pacote instalado, seguido do símbolo `::`.
-
-```{r, warning=FALSE, message=FALSE,results='hide'}
-psych::describe(c(1,2)) # Utilizando a função describe, do pacote "psych", sem carregá-lo
-```
-
-Apesar de ser necessário digitar mais caracteres para obter o resultado, chamar funções desta maneira apresenta duas vantagens. A primeira é que fica claro, em cada passo, qual pacote está sendo utilizado para executar determinada tarefa. Em segundo lugar, caso exista algum outro pacote com uma função de mesmo nome, não haverá o risco de utilizarmos a função errada para o problema que estamos tratando (evita-se ambiguidades).
-
 ## Criar uma função
 
-Você pode criar suas próprias funções do R. Por exemplo, ao invés de utilizar a função de soma `sum`, nós podemos criar nossa própria função para somar dois valores.
+Você pode criar suas próprias funções no R. Por exemplo, ao invés de utilizar a função de soma `sum`, nós podemos criar nossa própria função para somar dois valores.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Função para somar dois valores
@@ -398,7 +409,7 @@ Entre as classes de objetos, sempre que você tentar misturar elementos distinto
 
 **DOMINANTE** `character > complex > numeric > integer > logical` **RECESSIVO**
 
-As classes de um vetor poder ser alteradas com as seguintes funções:
+As classes de um vetor podem ser alteradas com as seguintes funções:
 
 ```{r}
 x <- 1:10
@@ -618,7 +629,7 @@ Observe que a escrita fica muito mais intuitiva e elegante. Para o caso do bolo:
 
 A utilização do pipe será muito importante para a manipulação das bases de dados, uma vez que, geralmente, são necessárias várias sequências de funções até que elas fiquem no formato desejado para análise.
 
-A utilização do pipe se tornou tão popular dentro da linguagem R que, a partir da versão 4.1, a linguagem trouxe um operador pipe nativo, com o símbolo `|>`. Ele, basicamente, faz as mesmas coisas que o operador original `%>%` faz. Para algumas diferenças, consulte [esse artigo](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). Quando este curso foi concebido, o operador nativo não existia, portanto, os exemplos aqui tratados utilização o operador original em seus exemplos. Contudo, utilize aquele de sua preferência. Você irá notar que, com o R, você terá diversas maneiras de fazer a mesma coisa!
+A utilização do pipe se tornou tão popular dentro da linguagem R que, a partir da versão 4.1, a linguagem trouxe um operador pipe nativo, com o símbolo `|>`. Ele, basicamente, faz as mesmas coisas que o operador original `%>%` faz. Para algumas diferenças, consulte [esse artigo](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). Quando este curso foi concebido, o operador nativo não existia, portanto, os exemplos aqui tratados utilizam o operador original em seus exemplos. Contudo, utilize aquele de sua preferência. Você irá notar que, com o R, você terá diversas maneiras de fazer a mesma coisa!
 
 ## Onde encontrar ajuda
 
@@ -691,7 +702,7 @@ Por fim, uma boa e velha máquina de buscas é fundamental. Quase todas as repos
 
 Vamos iniciar a atividade de manipulação de base de dados carregando um arquivo `.csv` encontrado na internet. Vamos trabalhar o estoque do Tesouro Direto, disponível no site do Tesouro Transparente, [nesse link](https://www.tesourotransparente.gov.br/ckan/dataset/4d4dac3b-96d2-4011-92c9-ddf7d8392622/resource/650cdc18-0513-4bb1-9222-003ad1c11ac7/download/EstoqueTesouroDireto.csv).
 
-Vamos carregar a pesquisa de duas maneiras: utilizando os atalhos do botão do RStudio e por linha de comando, utilizando o pacote `data.table`.
+Vamos carregaro arquivo de duas maneiras: utilizando os atalhos do botão do RStudio e por linha de comando, utilizando o pacote `data.table`.
 
 
 Antes, vamos criar um projeto para fazermos nossas análises. Acesse sua conta no [github](https://github.com/) e crie um novo repositório. Depois disso, vamos criar um novo projeto no RStudio server. Para isso, clique em `File` -> `New project` -> `Version Control` ->`Git`. No campo `Repository URL`, cole a url do projeto que você acabou de criar. 
@@ -750,16 +761,16 @@ rm(EstoqueTesouroDireto) # Remove apenas o objeto "EstoqueTesouroDireto"
 rm(list=ls()) # Remove todos os objetos do ambiente
 ```
 
-
 Note que você pode excluir todos os objetos do ambiente, listando-os com a função `ls()`. Contudo, os arquivos excluídos serão somente aqueles carregados no âmbiente global. Muitas vezes, objetos carregados em outros ambientes podem continuar carregados, consumindo a memória do computador. Utilize a função `gc()` para fazer uma limpeza na memória.
 
 ```{r}
 gc()
 ```
 
-Mesmo com esses dois procedimentos, o R não fica completamente "limpo". Por exemplo, todos os pacotes carregados na sessão permanecem prontos para uso, também consumindo memória. Para eliminar todos os objetos de todos os ambientes, será recessário iniciar uma nova sessão Para fazer isso, você pode clicar no botão vermelho do canto superior direito (liga/desliga) ou utilizar o atalho de teclado `crtl`+`shift`+`F10`.
+Mesmo com esses dois procedimentos, o R não fica completamente "limpo". Por exemplo, todos os pacotes carregados na sessão permanecem prontos para uso, também consumindo memória. Para eliminar todos os objetos de todos os ambientes, será recessário iniciar uma nova sessão.Para fazer isso, você pode utilizar o atalho de teclado `crtl`+`shift`+`F10` ou fechar e abrir novamente o RStudio.
+<!-- Para fazer isso, você pode clicar no botão vermelho do canto superior direito (liga/desliga) ou utilizar o atalho de teclado `crtl`+`shift`+`F10`. -->
 
-Vamos também definir o diretório padrão em que estamos trabalhando. O RStudio server, por padrão, utilizará a pasta do seu usuário no servidor. Para consultar o diretório ativo no momento, utilize a função `getwd()`.
+Vamos também definir o diretório padrão em que estamos trabalhando. O RStudio, por padrão, utilizará a pasta do seu usuário no computador. Para consultar o diretório ativo no momento, utilize a função `getwd()`.
 
 ```{r}
 getwd() # Consultar diretório de trabalho ativo
@@ -780,7 +791,7 @@ setwd("..")
 getwd()
 ```
 
-Repare que existem várias maneiras de definir o diretório padrão. Caso ele seja um subdiretório do qual você já está trabalhando atualmente, basta entrar com o caractere `.` antes do caminho desejado. Este recurso é um atalho para o endereço do diretório atualmente ativo no R. Você também pode indicar o caminho completo. Atente-se para o fato de que o padrão dos caminhos é a barra invertida `/`. Apesar de este ser o padrão Linux, ele também deve ser seguido nas demais plataformas, como o Windows (você pode utilizar também duas barras seguidas nos caminhos do Windows `\\`). Um atalho para o diretório padrão do seu R é o caractere `~`. O caractere `..` indica o nível anterior do diretório.
+Repare que existem várias maneiras de definir o diretório padrão. Caso ele seja um subdiretório do qual você já está trabalhando atualmente, basta entrar com o caractere `.` antes do caminho desejado. Este recurso é um atalho para o endereço do diretório atualmente ativo no R. Você também pode indicar o caminho completo. Atente-se para o fato de que o padrão dos caminhos é a barra invertida `/`. Apesar de este ser o padrão Linux, ele também deve ser seguido nas demais plataformas, como o Windows (você pode utilizar também duas barras seguidas nos caminhos do Windows `\\`). Um atalho para o diretório padrão do seu R é o caractere `~`. O caractere `..` indica o nível anterior do diretório atual.
 
 ## Método por linha de comando
 
@@ -808,26 +819,28 @@ Com a função `fread()` é possível carregar a base de ambas as maneiras vista
 
 Para isso, vamos precisar do pacote `DBI`, que fará a nossa conexão com o banco de dados. Isso é feito através da função `dbConnect()`.
 
-O primeiro argumento é o driver necessário para realizar a conexão, fornecido pelo pacote `odbc`. O segundo argumento desta função é o nome da conexão, atribuída no momento da configuração da conexão ODBC. No RServer, o nome atribuído foi `comeq`. Este argumento deve ser fornecido entre aspas. Os próximos argumentos são o nome de usuário e senha. Você deve usar as suas credenciais, fornecidas pelo administrador do banco de dados.
+O primeiro argumento é o driver necessário para realizar a conexão, fornecido pelo pacote `RPostgres`. O segundo argumento desta função é o nome do banco de dados. Para a COMEQ, o nome atribuído foi `comeq`. Este argumento deve ser fornecido entre aspas. Os próximos argumentos são o servidor, a porta, nome de usuário e senha. Você deve usar as suas credenciais, fornecidas pelo administrador do banco de dados.
 
 ```{r}
 # Carregar pacotes
 library(DBI)
 library(odbc)
 # Abrir conexão com o banco de dados
-# Atenção! Não utilize a função Sys.getenv sem confirar o ambiente antes!
-db <- DBI::dbConnect(odbc::odbc(),
-                     "comeq",
-                     uid=Sys.getenv("matricula"),
-                     pwd=Sys.getenv("senha"))
+# Atenção! Não utilize a função Sys.getenv sem configurar o ambiente antes!
+db <- DBI::dbConnect(RPostgres::Postgres(),
+                     dbname="comeq",
+                     host="psql12-dev",
+                     port="5432",
+                     user=Sys.getenv("user"),
+                     password=Sys.getenv("senha"))
 
 ```
 
 Pronto! Já estamos conectados ao banco de dados. 
 
-IMPORTANTE: sempre que você estiver escrevendo um código, o qual irá posteriormente subir no Github/Gitlab, NUNCA, JAMAIS e EM HIPÓTESE ALGUMA salve seu usuário e senha no script. Isto representa uma grave quebra de segurança, podendo ter importantes repercussões. Utilize umas das três opções: i) sempre preencha manualmente seu usuário e senha; utilize o arquivo `.Renviron` com suas credenciais (APENAS EM MÁQUINAS PRIVADAS); utilize o pacote `keyring` para o gerenciamento de credenciais. A solução acima utiliza o arquivo `.Renviron`, que pode ser configurada pelo RStudio com a função `usethis::edit_r_environ()`.
+IMPORTANTE: sempre que você estiver escrevendo um código, o qual irá posteriormente subir no Github/Gitlab, NUNCA, JAMAIS e EM HIPÓTESE ALGUMA salve seu usuário e senha no script. Isto representa uma grave quebra de segurança, podendo ter importantes repercussões. Utilize umas das três opções: i) sempre preencha manualmente seu usuário e senha; utilize o arquivo `.Renviron` com suas credenciais (APENAS EM MÁQUINAS PRIVADAS); utilize o pacote `keyring` para o gerenciamento de credenciais. A solução anterior utiliza o arquivo `.Renviron`, que pode ser configurada pelo RStudio com a função `usethis::edit_r_environ()`.
 
-Assim que você fizer a conexão, o pacote já ativa a aba `Connections`, no painel superior direito. 
+Assim que você fizer a conexão, o pacote já ativa a aba `Connections`, no painel superior direito (SOMENTE PARA CONEXÕES REALIZADAS COM O DRIVER DO PACOTE ODBC). 
 
 <img src="figuras/banco_consulta.png" style="width: 800px;display: block;margin-left: auto;margin-right: auto "/>
 
@@ -836,19 +849,20 @@ Por ali, você pode consultar os bancos, esquemas e tabelas disponíveis, bem co
 
 ```{r}
 DBI::dbListTables(db) # Consultar tabelas
+DBI::dbGetQuery(db,"SELECT * FROM pg_catalog.pg_tables;")
 DBI::dbListFields(db,Id(schema="pnadc",
-                        table="pnadt202301")) # Consultar colunas da tabela pnadt202301
+                        table="pnadt202401")) # Consultar colunas da tabela pnadt202301
 ```
 
 Feito isso, já estamos pronto para carregar uma base no R. Para isso, vamos utilizar a função `dbGetQuery`. Dentro dessa função, enviamos uma consulta SQL ao banco de dados, da mesma maneira que fazemos em qualquer outro programa de acesso a BD. A única diferença é que o pacote `DBI` estará intermediando a comunicação, apresentando os dados quando pertinente. Por exemplo, caso tenhamos permissão para tal, podemos criar, excluir ou alterar tabelas do banco de dados diretamente do R.
 
-Vamos, então, carregar a pnadc trimestral mais recente. A estrutura para realizar uma consulta é bastante simples: dizemos a ação que queremos realizar que, no caso da consulta, é feita com a palavra `select`; informamos as variáveis a serem carregadas, separando-as por vírgulas; dizemos de onde queremos obter esses dados, com a palavra `from`; e informamos o local em que a tabela está armazenada no banco de dados, na estrutura "esquema.tabela", no nosso caso, `pnadc.pnadt202301`.
+Vamos, então, carregar a pnadc trimestral mais recente. A estrutura para realizar uma consulta é bastante simples: dizemos a ação que queremos realizar que, no caso da consulta, é feita com a palavra `select`; informamos as variáveis a serem carregadas, separando-as por vírgulas; dizemos de onde queremos obter esses dados, com a palavra `from`; e informamos o local em que a tabela está armazenada no banco de dados, na estrutura "esquema.tabela", no nosso caso, `pnadc.pnadt202401`.
 
 Como consultamos os nomes das tabelas anteriormente, vamos carregar somente as informações sobre a UF,o peso do morador/domicílio (variável "V1028"), a situação do domicílio ("V1022") e o rendimento do trabalho ("VD4020"), para realizarmos um pequeno exercício.
 
 ```{r}
 # Carregar a base de moradores da PNADC
-pnadc <- DBI::dbGetQuery(db,'select "UF","V1028","V1022","VD4020" from pnadc.pnadt202301')
+pnadc <- DBI::dbGetQuery(db,'select "UF","V1028","V1022","VD4020" from pnadc.pnadt202401')
 ```
 
 No objeto `pnadc`, podemos consultar das informações carregadas. Você pode clicar no objeto carregado ou utilizar a função `View()`, utilizando o nome do objeto como argumento. Para consultar a classe do objeto carregado, utilize a função `class()`, enquanto, para ver os nomes da colunas, utilize as função `names()`. A função `head()` apresenta as primeiras linhas do data.frame, enquanto a função `tails()` apresenta as últimas. Os tipos das colunas podem ser consultados com a função `str()` ou `glimpse()`, do pacote `dplyr`. Finalmente, podemos consultar a quantidade de linhas e a quantidade de colunas carregadas com as funções `nrow()` e `ncol()`, respectivamente.
@@ -916,7 +930,7 @@ Perceba que foi necessário o conhecimento prévio de que o valor *53* estava pr
 # Consultar as linhas disponíveis
 pnadc %>%
   # Filtrar apenas linhas do esquema PDAD
-  dplyr::filter(stringr::str_detect(UF, pattern =  "5")) %>%
+  dplyr::filter(stringr::str_detect(UF, pattern =  "^5")) %>%
   # Selecionar apenas a coluna UF
   dplyr::pull(UF) %>% 
   # tabular os dados
@@ -928,7 +942,7 @@ Assim, podemos detectar facilmente um tipo de argumento quando não temos certez
 Muitas vezes precisamos alterar o nome de uma coluna, seja para tornar seu entendimento mais fácil, seja por questão de conveniência, seja por necessidade. Podemos fazer isso de duas maneiras: com a função `colnames()`, do pacote `base`, ou com a função `rename()`, do pacote `dplyr`.
 
 ```{r}
-# Alterar o nome da coluna "V1022" para Peso
+# Alterar o nome da coluna "V1028" para Peso
 colnames(pnadc)[2] <- "Peso"
 names(pnadc)[2] <- "Peso"
 # Verificar o resultado
@@ -1050,7 +1064,7 @@ Apesar de parecer mais complexo, isso evita que tenhamos de copiar, colar ou esc
 
 Agora que já conseguimos identificar qual foi a amostra em cada uma das UFs, vamos fazer um gráfico simples, para verificarmos onde obtivemos as maiores amostras. Para isso, vamos usar a o pacote `ggplot`.
 
-O `ggplot` trabalha com data.frames, e não somente com vetores individuais, como é o caso da função `plot`, disponível no pacote `graphics` do R. Uma vantagem do `ggplot` é que você pode adicionar camadas a um gráfico existente de maneira simples e rápida, com o operador `+`. A função `aes()` é utilizada para especificar quais serão os eixos do gráfico, usualmente x e y, bem como o que deverá ser desenhado no gráfico. Para um tutorial mais completo, acesse [esse site](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html).
+O `ggplot` trabalha com data.frames, e não somente com vetores individuais, como é o caso da função `plot`, disponível no pacote `graphics` do R. Uma vantagem do `ggplot` é que você pode adicionar camadas a um gráfico existente de maneira simples e rápida, com o operador `+`. A função `aes()` é utilizada para especificar quais serão os eixos do gráfico, usualmente x e y, bem como o que deverá ser desenhado no gráfico. Para um tutorial mais completo, acesse [esse site](http://r-statistics.co/ggplot2-Tutorial-With-R.html).
 
 ```{r}
 UF %>%
@@ -1062,7 +1076,7 @@ UF %>%
   coord_flip()
 ``` 
 
-Agora vamos organizar essas informações de uma outra maneira, resumindo o total da amostra por UF, refazendo o gráfico, para colocá-lo em ordem decrescente do n amostrada. Para isso, vamos utilizar o pacote `forcats`.
+Agora vamos organizar essas informações de uma outra maneira, resumindo o total da amostra por UF, refazendo o gráfico, para colocá-lo em ordem decrescente do n amostrado. Para isso, vamos utilizar o pacote `forcats`.
 
 ```{r}
 # Contar quantas pessoas foram amostradas em cada UF
@@ -1225,13 +1239,11 @@ Para gravar diretamente em um arquivo do tipo `.xlsx`, podemos utilizar a funç�
 
 ```{r}
 # Carregar o pacote
-library(xlsx)
+library(writexl)
 
 # Salvar as informações
-xlsx::write.xlsx(datas_tesouro_ipca,
-                 file = "dados/tesouro_ipca.xlsx",
-                 sheetName = "tesouro IPCA",
-                 row.names = F)
+writexl::write_xlsx(list("tesouro IPCA"=datas_tesouro_ipca),
+                    path  = "dados/tesouro_ipca.xlsx")
 ```
 
 Atualmente, o pacote grava apenas objetos do tipo `data.frame`. Lembre-se de converter o objeto do tipo `tibble` para `data.frame` antes de salvar, caso você esteja trabalhando com este tipo de informação.
@@ -1291,13 +1303,13 @@ library(ggrepel)
 library(sf)
 
 
-# Fazer a conexão no banco do NUGEO
-db <- DBI::dbConnect(odbc::odbc(),
-                     "comeq", 
-                     user=Sys.getenv("matricula"),
-                     password = Sys.getenv("senha"),
-                     maxvarcharsize=0 # Parâmetro necessário para não retornar erro na consulta
-                     )
+# Fazer a conexão com o banco
+db <- DBI::dbConnect(RPostgres::Postgres(),
+                     dbname="comeq",
+                     host="psql12-dev",
+                     port="5432",
+                     user=Sys.getenv("user"),
+                     password=Sys.getenv("senha"))
 
 # Puxar as informações de geometria
 UF <- sf::st_read(db, query="SELECT * FROM ibge.geo_uf",
@@ -1589,6 +1601,7 @@ Com essas informações, precisamos de apenas um passo para declarar o plano amo
 *Obs.:* a partir de 2021, o IBGE introduziu uma mudança na expansão da PNADC, que vigorava até então. Passaram a ser consideradas estimativas populacionais por faixas etárias e sexo. Anteriormente, as estimativas populacionais não contavam com esse detalhamento. Para mais informações, acesse a [nota técnica 04/2021](https://biblioteca.ibge.gov.br/visualizacao/livros/liv101882.pdf) do IBGE e [este site](https://guilhermejacob.github.io/2021/12/pnadc-raking-bootstrap/) e [este site](https://rstudio-pubs-static.s3.amazonaws.com/1001134_fb92955cf4774bbbaaebadd61d7218bf.html#fn1) para sua aplicação do R.
 
 ```{r}
+gc()
 # Carregar pacote
 library(srvyr)
 
@@ -1599,7 +1612,7 @@ vars <- c("UF","V1028","V1022","VD4020","V2009","V2005",
 # Carregar as informações
 pnadc <- DBI::dbGetQuery(db,paste0('select ',
                                    paste0('"',vars,'"',collapse = ","), 
-                                   'from pnadc.pnadt202301'))
+                                   'from pnadc.pnadt202401'))
 
 # Fazer o design 
 pnad_design <- survey::svrepdesign(data=pnadc, # Objeto com os dados
@@ -1611,6 +1624,10 @@ pnad_design <- survey::svrepdesign(data=pnadc, # Objeto com os dados
                                                              seq(1:200))), # n replicações
                                    df=length(sprintf("V1028%03d", # graus de liberdade
                                                      seq(1:200))))
+
+rm(pnadc)
+
+gc()
 
 # Deixar como tibble (para utilizar o pacote srvyr)
 pnad_design <-srvyr::as_survey(pnad_design)
@@ -1629,7 +1646,7 @@ pop18 <- pnad_design %>%
   srvyr::summarise(n=survey_total(count, vartype = c("ci","cv")))
 ```
 
-Verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas. 
+Verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2024, sendo o valor pontual de `r pop18[1,1]` pessoas. 
 
 Repare que, para calcular essas estimativas, foi necessário pegar do banco 201 variáveis de peso, o que significa um alto custo computacional de partida. Existe uma outra maneira de obter essas estimativas, com os mesmos valores pontuais, mas com variâncias ligeiramente diferentes. Para isso, necessitaremos das seguintes variáveis:
 
@@ -1654,7 +1671,7 @@ vars <- c("UF","V1028","V1022","VD4020","V2009","V2005","V2007","V2001",
 # Puxar os dados
 pnadc <- DBI::dbGetQuery(db,paste0('select ',
                                    paste0('"',vars,'"',collapse = ","), 
-                                   'from pnadc.pnadt202301'))
+                                   'from pnadc.pnadt202401'))
 
 # Ajustar tipo das variáveis
 pnadc <- pnadc %>%                          
@@ -1729,7 +1746,7 @@ pop18 <- pnad_design %>%
   srvyr::summarise(n=survey_total(count, vartype = "ci"))
 ```
 
-Agora, verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2023, sendo o valor pontual de `r pop18[1,1]` pessoas, exatamente o mesmo calculado anteriomente.
+Agora, verificamos que existiam entre `r pop18[1,2]` e  `r pop18[1,3]` pessoas com mais de 18 anos no Brasil no primeiro trimestre de 2024, sendo o valor pontual de `r pop18[1,1]` pessoas, exatamente o mesmo calculado anteriomente.
 
 Assim, caso existam limitações computacionais, esse método pode ser utilizado, ressalvando-se as diferenças existentes nas estimativas das variâncias.
 
@@ -1781,8 +1798,8 @@ Vamos agora elencar algumas variáveis para construirmos um pequeno relatório. 
 As informações serão criadas com a função `mutate()`, as faixas de idade e de rendimento serão criadas com auxílio da função `cut()`. Ao final, utilizaremos a função `mutate_if()` para transformar as variáveis do tipo *character* em fator e, por fim, utilizaremos a função `select()` para selecionar as variáveis desejadas. Para criar as faixas de rendimento, consideraremos o número de salários mínimos, vigente em 2023.
 
 ```{r}
-# Criar um objeto com o salário mínimo em 2023
-sm <- 1320
+# Criar um objeto com o salário mínimo em 2024
+sm <- 1412
 
 # Criar um objeto com as variáveis de interesse
 vars_relatorio <- pnad_design %>%
@@ -2137,8 +2154,9 @@ save.image("dados/objetos.rda", compress = T)
 # Carregar os objetos salvos
 load("dados/objetos.rda")
 # Salvar somente objetos de interesse
-# save(list=c("piramide","nmor","salario"),
-#      file="dados/objetos.rda")
+# save(list=c("piramide","nmor","salario",
+#             "piramide_grafico","nmor_grafico","salario_grafico"),
+#      file="exemplo_relatorio/dados/objetos.rda")
 ```
 
 Muitas vezes não precisamos salvar todo o nosso diretório e queremos apenas salvar um objeto específico, como um determinado banco de dados ou apenas os objetos que iremos utilizar no nosso relatório. Para isso, utilizamos a função `saveRDS()`. Vamos salvar os três gráficos que criamos anteriormente, neste formato.
@@ -2201,6 +2219,7 @@ Para inserirmos uma figura criada com o pacote `ggplot`, devemos "abrir" um *chu
 Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacote `kableExtra` para customizarmos as tabelas. Diferentemente das figuras, este pacote já esta preparado para receber as informações de título em parâmetros específicos, convertendo o resultado para a linguagem $\LaTeX$. Para algumas formatações adicionais, como separador de milhar, posicionamento da tabela e marcador decimal, a própria função `kable()` pode ser utilizada. Para referenciar as tabelas, utilize `tab:nome do chunk`. Abaixo está um exemplo de relatório, que deve ser executado em um arquivo `.Rmd`, bastando retirar os sustenidos.
 
 ```{r,eval=FALSE}
+
 # ---
 # title: "Mini relatório da PNADC"
 # author: "Thiago Mendes Rosa"
@@ -2219,24 +2238,25 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 # library(forcats)
 # library(scales)
 # knitr::opts_chunk$set(echo = F,fig.pos = 'H',warning=F)
-# # Carregar objetos
+# #Carregar objetos
 # load("dados/objetos.rda")
-# # Definir função para separador de milhar e decimal dos chunks
+# #Definir função para separador de milhar e decimal dos chunks
 # knitr::knit_hooks$set(inline = function(x) {
 #  prettyNum(x, big.mark=".",decimal.mark = ",")
 # })
 # options(kableExtra.latex.load_packages = FALSE)
-# # Habilitar opção abaixo para gerar tabelas em word. Para tanto,
-# # retirar o argumento "latex" da função "kable"
+# #Habilitar opção abaixo para gerar tabelas em word. Para tanto,
+# #retirar o argumento "latex" da função "kable"
 # #options(kableExtra.auto_format = FALSE)
 # library(kableExtra)
+# 
+# fonte="Fonte: PNADC 2024 - 1º Tri"
+# 
 # ```
 # 
-# # PNADC - 1º Trimestre de 2023
+# PNADC - 1º Trimestre de 2024
 # 
-# A PNADC visitou **`r nrow(pnadc[pnadc$V2005==1,])`** domicílios e coletou informações de `r nrow(pnadc)` moradores.
-# 
-# ## Estrutura etária
+# #Estrutura etária
 # 
 # A estrutura etária dos moradores do Brasil é apresentada  Figura \ref{fig:piramide}.
 # 
@@ -2257,12 +2277,12 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #  kableExtra::kable_styling(latex_options = c("HOLD_position"),
 #                            full_width=T) %>%
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PNADC 2023 - 1º Tri",
+#                       general=fonte,
 #                       fixed_small_size=T)
 # ```
 # \clearpage
 # 
-# ## Salários
+# #Salários
 # 
 # No que diz respeito aos salários, sua distribuição por faixas de salário mínimo^[O salário considerado foi de R$ 1.320,00] é apresentada  Figura \ref{fig:salarios}.
 # 
@@ -2284,18 +2304,18 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #                             full_width=T) %>%
 #   kableExtra::column_spec(1,width = "5cm") %>% 
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PNADC 2023 - 1º Tri",
+#                       general=fonte,
 #                       fixed_small_size=T)
 # ```
 # \clearpage
 # \pagebreak
 # 
-# ## Número de moradores por domicílio
+# #Número de moradores por domicílio
 # 
 # Por fim, a distribuição do número de moradores é apresentada na Figura \ref{fig:nmor}
 # 
-# ```{r nmor, fig.cap="Esgotamento sanitário",out.extra=''}
-# esgotamento_grafico
+# ```{r nmor, fig.cap="Número de moradores por domicílio",out.extra=''}
+# nmor_grafico
 # ```
 # 
 # Os números podem ser consultados na Tabela \ref{tab:nmor.tab}.
@@ -2303,7 +2323,7 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 # ```{r nmor.tab, results='asis'}
 # nmor %>% 
 # knitr::kable("latex",
-#             caption="Esgotamento sanitário",
+#             caption="Número de moradores por domicílio",
 #             booktabs = T,
 #             digits = 2,
 #             format.args=list(big.mark = ".",
@@ -2312,7 +2332,7 @@ Para as tabelas, utilizamos o pacote `knitr`, usualmente em conjunto com o pacot
 #                             full_width=T) %>%
 #   kableExtra::column_spec(1,width = "6cm") %>% 
 #  kableExtra::footnote(general_title ="",
-#                       general="Fonte: PNADC 2023 - 1º Tri",
+#                       general=fonte,
 #                       fixed_small_size=T)
 # ``` 
 

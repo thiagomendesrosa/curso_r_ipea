@@ -1,5 +1,5 @@
 ---
-title: "Mini relatório da PDAD 2018"
+title: "Mini relatório da PNADC"
 author: "Thiago Mendes Rosa"
 date: "`r Sys.Date()`"
 output:
@@ -16,26 +16,27 @@ header-includes:
 library(forcats)
 library(scales)
 knitr::opts_chunk$set(echo = F,fig.pos = 'H',warning=F)
-# Carregar objetos
-load("../dados/objetos.rda")
-# Definir função para separador de milhar e decimal dos chunks
+#Carregar objetos
+load("dados/objetos.rda")
+#Definir função para separador de milhar e decimal dos chunks
 knitr::knit_hooks$set(inline = function(x) {
  prettyNum(x, big.mark=".",decimal.mark = ",")
 })
 options(kableExtra.latex.load_packages = FALSE)
-# Habilitar opção abaixo para gerar tabelas em word. Para tanto,
-# retirar o argumento "latex" da função "kable"
+#Habilitar opção abaixo para gerar tabelas em word. Para tanto,
+#retirar o argumento "latex" da função "kable"
 #options(kableExtra.auto_format = FALSE)
 library(kableExtra)
+
+fonte="Fonte: PNADC 2024 - 1º Tri"
+
 ```
 
-# PDAD 2018
+PNADC - 1º Trimestre de 2024
 
-A PDAD 2018 visitou **`r nrow(pdad_2018_domicilios)`** domicílios e coletou informações de `r nrow(pdad_2018_moradores)` moradores.
+#Estrutura etária
 
-## Estrutura etária
-
-A estrutura etária dos moradores do Distrito Federal é apresentada  Figura \ref{fig:piramide}.
+A estrutura etária dos moradores do Brasil é apresentada  Figura \ref{fig:piramide}.
 
 ```{r piramide, fig.cap="Pirâmide etária",out.extra=''}
 piramide_grafico
@@ -54,14 +55,14 @@ knitr::kable("latex",
  kableExtra::kable_styling(latex_options = c("HOLD_position"),
                            full_width=T) %>%
  kableExtra::footnote(general_title ="",
-                      general="Fonte: PDAD 2018",
+                      general=fonte,
                       fixed_small_size=T)
 ```
 \clearpage
 
-## Salários
+#Salários
 
-No que diz respeito aos salários, sua distribuição por faixas de lário mínimo^[O salário considerado foi de R$ 954,00] é apresentada  Figura \ref{fig:salarios}.
+No que diz respeito aos salários, sua distribuição por faixas de salário mínimo^[O salário considerado foi de R$ 1.320,00] é apresentada  Figura \ref{fig:salarios}.
 
 ```{r salarios, fig.cap="Salarios por faixa de SM",out.extra=''}
 salario_grafico
@@ -81,26 +82,26 @@ knitr::kable("latex",
                             full_width=T) %>%
   kableExtra::column_spec(1,width = "5cm") %>% 
  kableExtra::footnote(general_title ="",
-                      general="Fonte: PDAD 2018",
+                      general=fonte,
                       fixed_small_size=T)
 ```
 \clearpage
 \pagebreak
 
-## Esgotamento
+#Número de moradores por domicílio
 
-Por fim, o esgotamento sanitário é apresentado na Figura \ref{fig:esgotamento}
+Por fim, a distribuição do número de moradores é apresentada na Figura \ref{fig:nmor}
 
-```{r esgotamento, fig.cap="Esgotamento sanitário",out.extra=''}
-esgotamento_grafico
+```{r nmor, fig.cap="Número de moradores por domicílio",out.extra=''}
+nmor_grafico
 ```
 
-Os números podem ser consultados na Tabela \ref{tab:esgotamento.tab}.
+Os números podem ser consultados na Tabela \ref{tab:nmor.tab}.
 
-```{r esgotamento.tab, results='asis'}
-esgotamento %>% 
+```{r nmor.tab, results='asis'}
+nmor %>% 
 knitr::kable("latex",
-            caption="Esgotamento sanitário",
+            caption="Número de moradores por domicílio",
             booktabs = T,
             digits = 2,
             format.args=list(big.mark = ".",
@@ -109,6 +110,6 @@ knitr::kable("latex",
                             full_width=T) %>%
   kableExtra::column_spec(1,width = "6cm") %>% 
  kableExtra::footnote(general_title ="",
-                      general="Fonte: PDAD 2018",
+                      general=fonte,
                       fixed_small_size=T)
 ``` 

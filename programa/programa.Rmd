@@ -29,11 +29,11 @@ E-mail: \url{thiago.rosa@ipea.gov.br}
 
 **Data do curso**
 
-A definir
+13/08 e 14/08/2024
 
-Horário: 08:00 às 12:00
+Horário: 13:00 às 18:00
 
-Carga horária: 8 horas
+Carga horária: 10 horas
 
 \bigskip
 
@@ -45,7 +45,7 @@ Carga horária: 8 horas
 
 **Requisitos básico:**
 
-- Ter login de acesso ao RStudio Server da COMEQ (solicitações para criação de usuário devem ser encaminhadas para DIRUR/COMEQ -- thiago.rosa@ipea.gov.br)
+- Ter acesso a uma máquina com R e RStudio instalados (pode ser em algum dos servidores do IPEA).
 
 **Requisitos desejáveis:**
 
@@ -72,7 +72,7 @@ O material completo do curso está disponível em:
     
     
 - Preliminares:
-    - Estrutura do RStudio Server;
+    - Estrutura do RStudio;
     - Pacotes;
     - Operadores básicos;
     - Utilizar chamada de funções;
@@ -98,11 +98,11 @@ O material completo do curso está disponível em:
     - Transformação de dados com `dplyr` e `tidyr`
     - Visualização de dados com `ggplot2`
     - Elaboração de relatórios com o `RMarkdown`
-    - Utilização do Github com o RStudio Server para controle e versionamento de projetos
+    - Utilização do Github com o RStudio para controle e versionamento de projetos
 
 \bigskip
 
-- Bônus
+- Extras
     - Extração de informações do Sidra (IBGE) diretamente no R
     - Extração de informações do IPEA Data diretamente no R
     
