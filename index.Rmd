@@ -158,6 +158,7 @@ Atualmente, o banco conta com as seguintes informações:
 - RAIS identificada
 - Dados metereológicos do INMET
 - Contas municipais (SICONFI)
+- Receita Federal
 
 As informações armazenadas no banco de dados podem ser facilmente carregadas pelo R (ou na maioria dos demais pacotes estatístico, como STATA ou SAS), por conexão ODBC -- acrônimo para *Open Database Connectivity*. Essas conexões podem ser configuradas uma única vez em máquinas locais seguindo [esses passos](https://www.sqlshack.com/configure-odbc-drivers-for-postgresql/). As bases podem ser acessadas com os pacotes `RODBC` ou `DBI`, através de consultas SQL (*Structured Query Language*), que nada mais é que uma linguagem estruturada para realizar consultas em bancos de dados. Além disso, é possível acessar o banco de dados com outras ferramentas específicas, como o [DBeaver](https://dbeaver.io/download/) ou o [PGadmin](https://www.pgadmin.org/).
 
