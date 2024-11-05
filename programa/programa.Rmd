@@ -5,9 +5,9 @@ title: |
   
   \
 
-  Curso introdutório de R
-author: 
- - Thiago Mendes Rosa
+  Manipulação de microdados com R
+#author: 
+# - Thiago Mendes Rosa
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
 output:
   pdf_document: default
@@ -29,7 +29,7 @@ E-mail: \url{thiago.rosa@ipea.gov.br}
 
 **Data do curso**
 
-13/08 e 14/08/2024
+04/12 e 05/12/2024
 
 Horário: 13:00 às 18:00
 
@@ -37,9 +37,15 @@ Carga horária: 10 horas
 
 \bigskip
 
+**Local**
+
+IPEA Brasília
+
+\bigskip
+
 **Público-alvo**
 
-- Pesquisadores do IPEA
+Pesquisadores do IPEA
 
 \bigskip
 
@@ -63,7 +69,7 @@ O material completo do curso está disponível em:
 
 - Introdução:
     - Por que usar o R e não outros softwares?
-    - RSutdio Server
+    - RStudio 
     - Banco de dados da COMEQ
     - GitHub
     - RMarkdown
@@ -86,7 +92,7 @@ O material completo do curso está disponível em:
     
 - Manipulação da PNADC Trimestral
     - Carga da PNADC
-    - Consultas ao banco de dados da Comeq
+    - Consultas ao banco de dados da COMEQ
     - Introdução ao `tidyverse`
     - Utilização do pacote `survey` para pesquisas amostrais
     - Estimativa de totais e proporções populacionais
