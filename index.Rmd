@@ -149,10 +149,12 @@ Atualmente, o banco conta com as seguintes informações:
 - IDHs municipais
 - Índice firjan
 - Projeções populacionais
+- Crédito Rural
+- Dados de renúncia fiscal de Goiás
 - PIB municipal
 - Comparecimento eleitoral
 - Contas anuais estaduais
-- Pagamentos e beneficioários do Bolsa Família e do BPC
+- Pagamentos e beneficiários do Bolsa Família e do BPC
 - Aeródromos brasileiros
 - CAGED identificado
 - RAIS identificada

@@ -5,7 +5,7 @@ title: |
   
   \
 
-  Manipulação de microdados com R
+  Banco de dados da COMEQ e Manipulação de microdados com R
 #author: 
 # - Thiago Mendes Rosa
 date: "`r format(Sys.Date(),'%d/%m/%Y')`"
@@ -31,9 +31,9 @@ E-mail: \url{thiago.rosa@ipea.gov.br}
 
 04/12 e 05/12/2024
 
-Horário: 13:00 às 18:00
+Horário: 14:00 às 18:00
 
-Carga horária: 10 horas
+Carga horária: 8 horas
 
 \bigskip
 
@@ -60,6 +60,32 @@ Pesquisadores do IPEA
 - Noções básicas de inglês (para facilitar pesquisas e entendimento das funções)
 
 \bigskip
+
+**Banco de dados da COMEQ**
+
+Será feita a apresentação do banco de dados da COMEQ e como realizar o acesso a partir do R. Serão apresentadas as tabelas disponíveis, as formas de acessar e como utilizar as informações.
+
+O banco conta com as seguintes informações:
+
+- PNADC trimestral
+- PNADC anual
+- Malhas territoriais do IBGE
+- Censo Demográfico
+- IDHs municipais
+- Índice firjan
+- Projeções populacionais
+- Crédito Rural
+- Dados de renúncia fiscal de Goiás
+- PIB municipal
+- Comparecimento eleitoral
+- Contas anuais estaduais
+- Pagamentos e beneficiários do Bolsa Família e do BPC
+- Aeródromos brasileiros
+- CAGED identificado
+- RAIS identificada
+- Dados metereológicos do INMET
+- Contas municipais (SICONFI)
+- Receita Federal
 
 **Conteúdo de R:**
 
